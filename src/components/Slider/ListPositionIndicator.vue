@@ -1,0 +1,72 @@
+<template>
+    <div 
+        class="list_position_indicator"
+
+    >
+        <p
+            v-html="value_formatted"
+            v-bind:style="{ fontSize: `${36 * this.scale }px` }"
+        ></p>
+        <p
+            v-html="separator_symbol"
+            v-bind:style="{ fontSize: `${36 * this.scale }px` }"
+        ></p>
+        <p
+            class="total_count"
+            v-html="total_count"
+            v-bind:style="{ fontSize: `${36 * this.scale }px` }"
+        ></p>
+    </div>
+</template>
+
+<script lang="ts">
+import Vue from "vue"
+
+export default Vue.extend({
+    computed: {
+       value_formatted: function(){
+            return this.value + 1
+        }
+    },
+    props: {
+        scale: {
+            type: Number,
+            default: ()=> 1  
+        },
+        total_count: {
+            type: Number,
+            default: ()=> 1  
+        },
+        value: {
+            type: Number,
+            default: ()=> 0
+        },
+        separator_symbol: {
+            type: String,
+            default: ()=> "/"
+        }
+    },
+    name: "ListPositionIndicator"
+})
+</script>
+
+<style lang="sass">
+    .list_position_indicator 
+        display: flex
+        flex-direction: row
+
+        p 
+            margin: 0
+            font-family: 'Montserrat', sans-serif
+            font-weight: 800
+            font-size: 36px
+            line-height: 44px
+            letter-spacing: 0.08em
+            text-transform: capitalize
+            color: #47FFBD
+            text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD  
+            
+            &.total_count
+                color: #303030 
+
+</style>
