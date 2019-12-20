@@ -8,7 +8,9 @@ import Vue from "vue"
 import { CombinedVueInstance } from 'vue/types/vue'
 import { forEach, castPath, isObject, isIndex, toKey } from "lodash-es"
 import { Object3D } from "three"
+
 import lerp from "lerp"
+
 
 export default Vue.extend({
     mounted () {
@@ -16,20 +18,29 @@ export default Vue.extend({
         window.k = this
     },
     props: {
-        position_x: { type: Number, default: ()=> 0 },
-        position_y: { type: Number, default: ()=> 0 },
-        position_z: { type: Number, default: ()=> 0 },
-        scale_x: { type: Number, default: ()=> 1 },
-        scale_y: { type: Number, default: ()=> 1 },
-        scale_z: { type: Number, default: ()=> 1 },
-        rotation_x: { type: Number, default: ()=> 0 },
-        rotation_y: { type: Number, default: ()=> 0 },
-        rotation_z: { type: Number, default: ()=> 0 },
+        _position_x: { type: Number, default: ()=> 0 },
+        _position_y: { type: Number, default: ()=> 0 },
+        _position_z: { type: Number, default: ()=> 0 },
+        _scale_x   : { type: Number, default: ()=> 1 },
+        _scale_y   : { type: Number, default: ()=> 1 },
+        _scale_z   : { type: Number, default: ()=> 1 },
+        _rotation_x: { type: Number, default: ()=> 0 },
+        _rotation_y: { type: Number, default: ()=> 0 },
+        _rotation_z: { type: Number, default: ()=> 0 },
     },
     data () {
         return {
             animations: {},
-            object_type: "object"
+            object_type: "object",
+            position_x: 0,
+            position_y: 0,
+            position_z: 0,
+            scale_x   : 1,
+            scale_y   : 1,
+            scale_z   : 1,
+            rotation_x: 0,
+            rotation_y: 0,
+            rotation_z: 0,
         }  
     },
     name: "ThreeObject3D",
@@ -37,12 +48,22 @@ export default Vue.extend({
         position_x (new_value) { this.object3D.position.x = new_value },
         position_y (new_value) { this.object3D.position.y = new_value },
         position_z (new_value) { this.object3D.position.z = new_value },
-        scale_x (new_value) { this.object3D.scale.x = new_value },
-        scale_y (new_value) { this.object3D.scale.y = new_value },
-        scale_z (new_value) { this.object3D.scale.z = new_value },
+        scale_x    (new_value) { this.object3D.scale.x    = new_value },
+        scale_y    (new_value) { this.object3D.scale.y    = new_value },
+        scale_z    (new_value) { this.object3D.scale.z    = new_value },
         rotation_x (new_value) { this.object3D.rotation.x = new_value },
         rotation_y (new_value) { this.object3D.rotation.y = new_value },
         rotation_z (new_value) { this.object3D.rotation.z = new_value },
+
+        _position_x (new_value) { this.position_x = new_value },
+        _position_y (new_value) { this.position_y = new_value },
+        _position_z (new_value) { this.position_z = new_value },
+        _scale_x    (new_value) { this.scale_x    = new_value },
+        _scale_y    (new_value) { this.scale_y    = new_value },
+        _scale_z    (new_value) { this.scale_z    = new_value },
+        _rotation_x (new_value) { this.rotation_x = new_value },
+        _rotation_y (new_value) { this.rotation_y = new_value },
+        _rotation_z (new_value) { this.rotation_z = new_value },
     },
     computed: {
         object3D () {
@@ -58,6 +79,16 @@ export default Vue.extend({
             this.component = this.$el.component = this
         },
         init_transform_props () {
+            this.position_x = this._position_x
+            this.position_y = this._position_y
+            this.position_z = this._position_z
+            this.scale_x    = this._scale_x   
+            this.scale_y    = this._scale_y   
+            this.scale_z    = this._scale_z   
+            this.rotation_x = this._rotation_x
+            this.rotation_y = this._rotation_y
+            this.rotation_z = this._rotation_z
+
             this.object3D.position.x = this.position_x
             this.object3D.position.y = this.position_y
             this.object3D.position.z = this.position_z

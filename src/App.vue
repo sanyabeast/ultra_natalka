@@ -4,116 +4,40 @@
     ref="root"
     v-on:mousewheel.prevent="on_mousewheel"
   >
-    <ListPositionIndicator 
-      :scale="1"
-      :total_count="3"
+
+    <SplashScreen
+      :enabled="true"
+      @before_disappearing="on_splashscreen_before_disappearing"
     />
 
     <div
       class="pages_wrapper"
       ref="pages_wrapper"
     >
-      <Page >
-        <ImageViewGL
-          :shader="{
-            shader_diffus_map_url: 'pics/image 8.png', 
-            shader_distortion_map_url: 'pics/distortion_nmap.jpg', 
-            shader_distortion_move_speed: 4, 
-            shader_distortion_power: 0.333,
-            shader_tint_on_hover_color: '#ff00ff',
-            shader_tint_on_hover_speed: 5
-          }"
-          :frame_skipping="2"
-          :image_size_x="720"
-          :image_size_y="426"
-          distortion_map="pics/distortion_nmap.jpg"
-          :passes="['increase_global_effect_power_on_hover', 'distortion', 'render', 'tint_on_hover']"
-        />
-
-        <ImageViewGL
-          :shader="{
-            shader_diffus_map_url: 'pics/image 8.png', 
-            shader_distortion_map_url: 'pics/stone_nmap.jpg', 
-            shader_distortion_move_speed: 4, 
-            shader_distortion_power: 0.333,
-            shader_tint_on_hover_color: '#ff0000',
-            shader_tint_on_hover_speed: 5,
-            shader_increase_global_effect_power_speed: 1
-          }"
-          :frame_skipping="2"
-          :image_size_x="720"
-          :image_size_y="426"
-          distortion_map="pics/distortion_nmap.jpg"
-          :passes="['increase_global_effect_power_on_hover', 'parabolic_global_effect_power_modifier', 'sinusal_distortion', 'render', 'tint_on_hover']"
-        />
-
-        <MeshViewGL
-          :shader_settings="{
-            shader_diffus_map_url: 'pics/image 8.png', 
-            shader_distortion_map_url: 'pics/distortion_nmap.jpg', 
-            shader_distortion_move_speed: 4, 
-            shader_distortion_power: 0.333,
-            shader_tint_on_hover_color: '#ff00ff',
-            shader_tint_on_hover_speed: 5
-          }"
-          :frame_skipping="3"
-          :image_size_x="720"
-          :image_size_y="426"
-          distortion_map="pics/distortion_nmap.jpg"
-          :passes="['increase_global_effect_power_on_hover', 'distortion', 'render', 'tint_on_hover']"
-        />
+      <PrimePage
+        page_id="osobnyak"
+        :page_index="0"
+        ticker_text="osobnyak"
+        page_image_src="pics/osobnyak_image.png"
+        class="main_page"
+        photo_caption_text="Osobnyak"
+      />
         
+      <PrimePage
+        page_id="leverpresso"
+        :page_index="1"
+        ticker_text="leverpresso"
+        page_image_src="pics/lp_image.png"
+        photo_caption_text="Leverpresso"
+      />
 
-        <Ticker
-          text="osobnyak"
-          :animation_speed="22"
-        
-        />
-
-        <Ticker
-          class="kek"
-          text="LOLKEK!"
-          :animation_speed="44"
-        
-        />
-
-        <Ticker
-          class="kek"
-          text="чебуречек!"
-          :animation_speed="16"
-        
-        />
-
-      </Page>
-        
-      <Page>
-        <ImageViewGL
-          :shader="{
-            shader_diffus_map_url: 'pics/image 8.png', 
-            shader_distortion_map_url: 'pics/distortion_nmap.jpg', 
-            shader_distortion_move_speed: 4, 
-            shader_distortion_power: 0.333,
-            shader_tint_on_hover_color: '#ff00ff',
-            shader_tint_on_hover_speed: 5
-          }"
-          :frame_skipping="3"
-          :image_size_x="720"
-          :image_size_y="426"
-          distortion_map="pics/distortion_nmap.jpg"
-          :passes="['increase_global_effect_power_on_hover', 'distortion', 'render', 'tint_on_hover']"
-        />
-
-
-        <Ticker
-          class="kek"
-          text="чебуречек!"
-          :animation_speed="16"
-        
-        />
-      </Page>
-      <Page>
-        
-      </Page>
+      <PrimePage
+        page_id="kyivcorner"
+        :page_index="2"
+        ticker_text="kyivcorner"
+        page_image_src="pics/kc_image.png"
+        photo_caption_text="Kyivcorner"
+      />
     </div>
 
   </div>
@@ -123,25 +47,24 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import ListPositionIndicator from "./components/Slider/ListPositionIndicator.vue"
-import ImageViewGL from "./components/ImageViewGL/ImageViewGL.vue"
-import Page from "./components/Page.vue"
-import Ticker from "./components/Ticker.vue"
-import { TweenMax } from "gsap"
+import PrimePage from "./components/Pages/PrimePage.vue"
+import { TweenMax, TimelineMax } from "gsap"
 import { throttle } from "lodash-es"
+
+import SplashScreen from "./components/SplashScreen.vue"
 
 export default Vue.extend({
   name: 'App',
 
   components: {
-    ListPositionIndicator,
-    ImageViewGL,
-    Page,
-    Ticker
+    PrimePage,
+    SplashScreen
   },
 
   mounted () {
+    this.setup_animations()
     let prev_time = +new Date()
+
     setInterval(()=>{
       let now = +new Date()
       this.$store.state.shader_time += (now - prev_time) / 1000000
@@ -156,27 +79,94 @@ export default Vue.extend({
       return pages.length
     }
   },
+  
 
-  data: () => ({
-    active_page_index: 0
-  }),
+  data: () => {
+    let appearing_animation = new TimelineMax()
+    appearing_animation.pause()
+
+    return {
+      prev_page_index: 0,
+      active_page_index: 0,
+      last_scroll_direction: 1,
+      scroll_tween_duration: 0.777,
+      scroll_tween_easing: "Power4.easeInOut",
+      scroll_tween_a: null,
+      scroll_tween_b: null,
+      appearing_animation
+    }
+  },
 
   watch: {
     active_page_index ( value ) {
       let pages = this.$refs.pages_wrapper.querySelectorAll(".page")
       let page = pages[value]
+      let prev_page = pages[this.prev_page_index]
 
-      if (this.scrooll_tween){
-        this.scrooll_tween.kill()
-        this.scrooll_tween = null
+      if (this.scroll_tween_a !== null){
+        this.scroll_tween_a.kill()
+        this.scroll_tween_a = null
       }
 
-      this.scrooll_tween = TweenMax.to(this.$refs.root, 1, {
-        scrollLeft: page.offsetLeft,
-        onComplete: ()=>{
-          this.scroll_twee = null
-        }
-      })
+      if (this.scroll_tween_b !== null){
+        this.scroll_tween_b.kill()
+        this.scroll_tween_b = null
+      }
+
+      switch ( this.last_scroll_direction ) {
+        case 1:
+
+          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
+            xPercent: 100,
+            opacity: 0
+          }, {
+            xPercent: 0,
+            opacity: 1,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_a = null
+            }
+          } )
+
+          this.scroll_tween_b =TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
+            xPercent: 0,
+            opacity: 1,
+          }, {
+            xPercent: -100,
+            opacity: 0,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_b = null
+            }
+          } )
+          
+        break;
+        case -1:
+          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
+            xPercent: -100,
+            opacity: 0,
+          }, {
+            xPercent: 0,
+            opacity: 1,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_a = null
+            }
+          } )
+
+          this.scroll_tween_b = TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
+            xPercent: 0,
+            opacity: 1
+          }, {
+            xPercent: 100,
+            opacity: 0,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_b = null
+            }
+          } )
+        break;
+      }
 
       // this.$refs.root.scrollLeft = value* 1000
 
@@ -186,11 +176,17 @@ export default Vue.extend({
 
   methods: {
     on_mousewheel: function( evt ){
+      if (this.scroll_tween_a !== null && this.scroll_tween_b !== null) {
+        return
+      }
+
       let new_index = this.active_page_index
       if (evt.deltaY > 0){
         new_index++
+        this.last_scroll_direction = 1
       } else {
         new_index--
+        this.last_scroll_direction = -1
       }
 
       if (new_index >= this.total_pages_count){
@@ -202,7 +198,18 @@ export default Vue.extend({
         new_index = this.total_pages_count - 1
       }
 
+      this.prev_page_index = this.active_page_index
       this.active_page_index = new_index
+    },
+    setup_animations () {
+      this.appearing_animation.fromTo(this.$refs.pages_wrapper, 1, {
+        yPercent: 0
+      }, {
+        yPercent: 0   
+      })
+    },
+    on_splashscreen_before_disappearing () {
+      // this.appearing_animation.resume()
     }
   }
 });
@@ -223,33 +230,26 @@ export default Vue.extend({
     display: flex
     flex-direction: row
     width: 100vw
-    overflow-x: scroll!important
 
     .pages_wrapper
+      width: 100%
+      height: 100%
       display: flex
       flex-direction: row
+      overflow: hidden
 
-      .image_view_gl 
-        width: 100%
-        height: 100%
-
-      .list_position_indicator
-        position: absolute 
 
       .page 
+        flex-shrink: 0
         width: 100vw
-        position: relative
-        .ticker 
-          top: 0
-          left: 0
-          transform: rotateZ(-90deg)
-          transform-origin: left right
-          height: 100vh
+        position: absolute
+        top: 0
+        left: 0
+        opacity: 0
 
-          .kek 
-            transform: translateX(-60%)
-
-  
-      
+        &.main_page 
+          opacity: 1
+        
+        
 
 </style>

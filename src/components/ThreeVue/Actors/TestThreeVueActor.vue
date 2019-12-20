@@ -5,14 +5,14 @@
         <three-mesh
             v-for="(data, index) in meshes"
             :key="index"
-            :rotation_y="box_rotation"
-            :rotation_x="box_rotation"
-            :position_z="position_z"
-            :position_x="mesh_pos_x(index)"
-            :position_y="mesh_pos_y(index)"
-            :scale_x="mesh_scale"
-            :scale_y="mesh_scale"
-            :scale_z="mesh_scale"
+            :_rotation_y="box_rotation"
+            :_rotation_x="box_rotation"
+            :_position_z="position_z"
+            :_position_x="mesh_pos_x(index)"
+            :_position_y="mesh_pos_y(index)"
+            :_scale_x="mesh_scale"
+            :_scale_y="mesh_scale"
+            :_scale_z="mesh_scale"
             
         >
             <three-material

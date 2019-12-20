@@ -1,6 +1,7 @@
 <template>
     <div 
         class="page"
+        v-bind:data-page-id="page_id"
     >
         <slot></slot>
     </div>
@@ -12,10 +13,17 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'Page',
+  name: 'PrimePage',
 
   components: {
 
+  },
+
+  props: {
+    page_id: {
+      type: String,
+      default: ()=> "page"
+    }
   },
 
   data: () => ({

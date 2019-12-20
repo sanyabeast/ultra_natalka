@@ -13,7 +13,7 @@
         ></p>
         <p
             class="total_count"
-            v-html="total_count"
+            v-html="`0${total_count}`"
             v-bind:style="{ fontSize: `${36 * this.scale }px` }"
         ></p>
     </div>
@@ -25,7 +25,7 @@ import Vue from "vue"
 export default Vue.extend({
     computed: {
        value_formatted: function(){
-            return this.value + 1
+            return `0${this.value + 1}`
         }
     },
     props: {

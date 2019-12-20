@@ -9,7 +9,7 @@
             :perspective_camera_fov="perspective_camera_fov"
             :orthographic_camera_width="orthographic_camera_width"
         >
-            <animation
+            <!-- <animation
                 animation_name="camera_shaking"
                 :animation_target="camera_component"
                 :animation_auto_play="true"
@@ -21,10 +21,10 @@
                 }"
                 :animation_loop="-1"
                 :animation_yoyo="true"
-            />
+            /> -->
         </ThreeCamera>
 
-        <animation
+        <!-- <animation
             animation_name="camera_appearing"
             :animation_target="self"
             :animation_auto_play="true"
@@ -35,7 +35,7 @@
                 camera_position_y: [ 300, 0 ],
             }"
             :animation_loop="0"
-        />
+        /> -->
 
         
     
@@ -162,7 +162,10 @@ export default Vue.extend({
             this.context2d.drawImage(this.$store.state.gl_renderer.domElement, 0, 0)
         }
     },
-    components: {ThreeCamera, Animation}
+    components: {
+        ThreeCamera, 
+        // Animation
+    }
 })
 </script>
 <style scoped lang="sass">

@@ -7,7 +7,9 @@
 import Vue from "vue"
 
 import ThreeObject3D from "./ThreeObject3D"
-import { Geometry, SphereBufferGeometry, BoxBufferGeometry, ConeBufferGeometry, TorusBufferGeometry } from "three"
+import { Geometry, BufferGeometry, SphereBufferGeometry, BoxBufferGeometry, ConeBufferGeometry, TorusBufferGeometry } from "three"
+import OBJLoader from "./Loaders/OBJLoader.js"
+import { forEach } from "lodash-es"
 
 export default Vue.extend({
     props: {
@@ -36,6 +38,10 @@ export default Vue.extend({
                 }
             }
         },
+        geometry_file_url: {
+            type: String,
+            default: ()=> ""
+        },
         box_size_x: {
             type: Number,
             default: ()=> 5
@@ -56,33 +62,67 @@ export default Vue.extend({
     },
     mounted () {
         this.bind_to_dom_element()
-        let GeometryClass = this.get_geometry_class(this.geometry_type)
         let geometry: Geometry
+        let loader
 
         switch (this.geometry_type){
-            case "SphereBufferGeometry": geometry = new GeometryClass(this.geometry_params.sphere_radius, this.geometry_params.sphere_segments_x,  this.geometry_params.sphere_segments_y); break;
-            case "BoxBufferGeometry": geometry = new GeometryClass(this.geometry_params.box_size_x, this.geometry_params.box_size_y, this.geometry_params.box_size_z); break;
-            case "ConeBufferGeometry": geometry = new GeometryClass(this.geometry_params.cone_radius, this.geometry_params.cone_height, this.geometry_params.cone_radial_segments); break;
-            case "TorusBufferGeometry": geometry = new GeometryClass(this.geometry_params.torus_radius, this.geometry_params.torus_tube, this.geometry_params.torus_radial_segments, this.geometry_params.torus_tubular_segements); break;
-        }
+            case "SphereBufferGeometry": geometry = new SphereBufferGeometry(this.geometry_params.sphere_radius, this.geometry_params.sphere_segments_x,  this.geometry_params.sphere_segments_y); break;
+            case "BoxBufferGeometry": geometry = new BoxBufferGeometry(this.geometry_params.box_size_x, this.geometry_params.box_size_y, this.geometry_params.box_size_z); break;
+            case "ConeBufferGeometry": geometry = new ConeBufferGeometry(this.geometry_params.cone_radius, this.geometry_params.cone_height, this.geometry_params.cone_radial_segments); break;
+            case "TorusBufferGeometry": geometry = new TorusBufferGeometry(this.geometry_params.torus_radius, this.geometry_params.torus_tube, this.geometry_params.torus_radial_segments, this.geometry_params.torus_tubular_segements); break;
+            case "OBJLoader":
 
+                geometry = new BufferGeometry()
+                loader = new OBJLoader();
+                console.log(11, loader)
+
+                loader.load(
+                    this.geometry_file_url,
+                    function ( object ) {
+                        let inited = false
+
+                        forEach(object.children, (mesh)=>{
+
+                            if (!inited){
+                                inited = true
+                                
+                                forEach(mesh.geometry.attributes, (attribute, name)=>{
+                                    // geometry.addAttribute(name)
+                                    // console.log(geometry)
+                                })
+
+                            } else {
+                                console.log(mesh.matrix)
+                                forEach(mesh.geometry.attributes)
+                                geometry.merge(mesh.geometry, mesh.matrix)
+
+                            }
+
+                        })
+
+                        geometry.needsUpdate = true
+                    },
+                    // called when loading is in progresses
+                    function ( xhr ) {
+
+                        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+                    },
+                    // called when loading has errors
+                    function ( error ) {
+
+                        console.log( 'An error happened' );
+
+                    }
+                );
+
+            break
+        }
+    console.log(geometry)
         this.geometry = geometry
     },
     mixins: [ ThreeObject3D ],
     methods: {
-        get_geometry_class(type: String) {
-            let result
-
-            switch (type) {
-                case "SphereBufferGeometry": result = SphereBufferGeometry; break;
-                case "BoxBufferGeometry": result = BoxBufferGeometry; break;
-                case "ConeBufferGeometry": result = ConeBufferGeometry; break;
-                case "TorusBufferGeometry": result = TorusBufferGeometry; break;
-                default: result = SphereBufferGeometry;   break;
-            }
-
-            return result
-        }
     }
 })
 </script>

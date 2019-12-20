@@ -78,13 +78,14 @@ export default Vue.extend({
                 margin: 0 0%
 
                 p 
+                    color: #202020
                     flex-shrink: 0
-                    font-family: Montserrat
+                    font-family: 'Montserrat', sans-serif
                     font-style: normal
                     font-weight: 900
-                    font-size: 96px
+                    font-size: 132px
                     font-variant: small-caps
-                    text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
+                    text-shadow: -1px -1px 0 #70ffb5,  1px -1px 0 #70ffb5, -1px 1px 0 #70ffb5,  1px 1px 0 #70ffb5 
 
             
     

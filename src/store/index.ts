@@ -51,16 +51,16 @@ class GameLoop {
 
 }
 
-const gl_renderer = new WebGLRenderer({ antialias: false, alpha: true })
-gl_renderer.setClearColor(0x000000, 0)
-gl_renderer.autoClear = true
+// const gl_renderer = new WebGLRenderer({ antialias: false, alpha: true })
+// gl_renderer.setClearColor(0x000000, 0)
+// gl_renderer.autoClear = true
 
-window.glr = gl_renderer
+// window.glr = gl_renderer
 
 export default new Vuex.Store({
   state: {
-    shader_time: 0,
-    gl_renderer: gl_renderer,
+    // shader_time: 0,
+    // gl_renderer: gl_renderer,
     game_loop: new GameLoop().run()
   },
   mutations: {

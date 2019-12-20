@@ -14,18 +14,6 @@
       ref="pages_wrapper"
     >
       <Page >
-        <!-- <three-scene
-          :frame_skip="1"
-          :camera_position_z="20"
-          :perspective_camera_fov="60"
-        > -->
-        <!-- <three-mesh
-
-          >
-            <three-material></three-material>
-            <three-geometry></three-geometry>
-          </three-mesh>
-        </three-scene>  -->
 
         <three-scene
           :frame_skip="1"
@@ -43,93 +31,17 @@
 
         <three-scene
           :frame_skip="1"
-          :perspective_camera_fov="15"
-          :camera_position_z="100"
-        >
-           <TestThreeVueActor
-            :position_x="-40"
-            :rotation_duration="6"
-            :mesh_scale="10"
-            :mesh_spacing="1.5"
-            :meshes="[0,0,0,0,0,0,0,0,0,0,0,0]"
-          />
-        </three-scene>
-
-        <three-scene
-          :frame_skip="1"
-          :perspective_camera_fov="120"
-          :camera_position_z="100"
-        >
-           <TestThreeVueActor
-            :position_x="-40"
-            :rotation_duration="5"
-            :geometry_params="{
-              cone_radius: 0.3
-            }"
-            mesh_geometry_type="ConeBufferGeometry"
-            :mesh_scale="80"
-            :mesh_spacing="3"
-            :meshes="[0,0,0,0,0]"
-          />
-
-          <TestThreeVueActor
-            :position_x="-40"
-            :rotation_duration="5"
-            :geometry_params="{
-              cone_radius: 0.3
-            }"
-            mesh_geometry_type="ConeBufferGeometry"
-            :mesh_scale="20"
-            :mesh_spacing="6"
-            :meshes="[0,0,0,0,0,0,0,0,0,0,0,0]"
-          />
-        </three-scene>
-
-        <three-scene
-          :frame_skip="1"
-          :perspective_camera_fov="15"
-          :camera_position_z="100"
-        >
-           <TestThreeVueActor
-            mesh_geometry_type="TorusBufferGeometry"
-            :position_x="-40"
-            :rotation_duration="20"
-            :mesh_scale="1"
-            :mesh_spacing="8"
-            :meshes="[0,0,0,0]"
-          />
-        </three-scene>
-
-        <three-scene
-          :frame_skip="1"
-          :perspective_camera_fov="15"
-          :camera_position_z="100"
-        >
-           <TestThreeVueActor
-            mesh_geometry_type="TorusBufferGeometry"
-            :position_x="-40"
-            :rotation_duration="20"
-            :mesh_scale="5"
-            :mesh_spacing="4"
-            :meshes="[0,0,0,0]"
-          />
-        </three-scene>
-
-        <three-scene
-          :frame_skip="1"
           :perspective_camera_fov="45"
           :camera_position_z="100"
         >
-          <TestThreeVueActor
-            :position_x="-40"
-            :rotation_duration="4"
-            :mesh_scale="3"
-            :mesh_spacing="6"
-            :meshes="[0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]"
-          />
+          <three-mesh>
+            <three-material></three-material>
+            <three-geometry
+              geometry_type="OBJLoader"
+              geometry_file_url="obj/pistol.obj"></three-geometry>
+          </three-mesh>
         
         </three-scene>
-
 
       </Page>
         
@@ -179,9 +91,9 @@ export default Vue.extend({
     Ticker,
     // MeshViewGL,
     ThreeScene,
-    // ThreeMesh,
-    // ThreeMaterial,
-    // ThreeGeometry,
+    ThreeMesh,
+    ThreeMaterial,
+    ThreeGeometry,
 
     TestThreeVueActor
     // ThreeLight
@@ -204,7 +116,8 @@ export default Vue.extend({
   },
 
   data: () => ({
-    active_page_index: 0
+    active_page_index: 0,
+    scrooll_tween: null
   }),
 
   watch: {
@@ -220,7 +133,7 @@ export default Vue.extend({
       this.scrooll_tween = TweenMax.to(this.$refs.root, 1, {
         scrollLeft: page.offsetLeft,
         onComplete: ()=>{
-          this.scroll_twee = null
+          this.scroll_tween = null
         }
       })
 
