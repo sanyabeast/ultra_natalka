@@ -10,6 +10,7 @@
         <div class="content">
                 <ImageComponent
                         :image_src="page_image_src"
+                        @click="on_image_click"
                 />
 
                 <div class="foot">
@@ -60,7 +61,7 @@ export default Vue.extend({
           },
           ticker_animation_speed: {
                   type: Number,
-                  default: ()=> 10
+                  default: ()=> 5
           },
           page_image_src: {
                   type: String,
@@ -74,6 +75,13 @@ export default Vue.extend({
   data: () => ({
     //
   }),
+  methods: {
+          on_image_click () {
+                  this.$emit("image_click", {
+                          component: this
+                  })
+          }
+  }
 });
 </script>
 
@@ -89,8 +97,8 @@ export default Vue.extend({
         justify-content: center
 
         .ticker 
-          top: calc(50vh - 56px)
-          right: 0
+          position: absolute
+          top: 0
           width: 100vh  
 
         .content 
@@ -101,6 +109,7 @@ export default Vue.extend({
                         height: 400px   
                         margin-right: 64px
                         display: flex
+                        cursor: pointer
                 
                 .foot 
                         display: flex

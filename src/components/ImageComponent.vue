@@ -2,6 +2,8 @@
     <div 
         class="image_component"
         ref="root"
+        @click="on_click"
+        @mouseover="on_hover"
     >
         <img
                 ref="image_element"
@@ -46,6 +48,12 @@ export default Vue.extend({
                 this.real_width = this.$refs.image_element.width
                 this.real_height = this.$refs.image_element.height
                 this.image_loaded = true
+          },
+          on_click () {
+                  this.$emit("click")
+          },
+          on_hover () {
+                  this.$emit("hover")
           }
   }
 });

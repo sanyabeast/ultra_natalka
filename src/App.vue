@@ -2,18 +2,20 @@
   <div 
     class="app-root"
     ref="root"
-    v-on:mousewheel.prevent="on_mousewheel"
-  >
+    >
+
+    
 
     <SplashScreen
-      :enabled="true"
+      :enabled="false"
       @before_disappearing="on_splashscreen_before_disappearing"
     />
 
     <div
-      class="pages_wrapper"
-      ref="pages_wrapper"
-    >
+        class="prime_pages_wrapper"
+        ref="prime_pages_wrapper"
+        v-on:mousewheel.prevent="on_prime_pages_wrapper_mousewheel"
+      >
       <PrimePage
         page_id="osobnyak"
         :page_index="0"
@@ -21,6 +23,7 @@
         page_image_src="pics/osobnyak_image.png"
         class="main_page"
         photo_caption_text="Osobnyak"
+        @image_click="open_minor_page(0)"
       />
         
       <PrimePage
@@ -29,6 +32,7 @@
         ticker_text="leverpresso"
         page_image_src="pics/lp_image.png"
         photo_caption_text="Leverpresso"
+        @image_click="open_minor_page(1)"
       />
 
       <PrimePage
@@ -37,7 +41,61 @@
         ticker_text="kyivcorner"
         page_image_src="pics/kc_image.png"
         photo_caption_text="Kyivcorner"
+        @image_click="open_minor_page(2)"
       />
+    </div>
+
+    <div
+      class="minor_pages_wrapper"
+      ref="minor_pages_wrapper">
+      <MinorPage
+        prime_caption_text="OSOBNYAK"
+        minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
+        :images="[
+          { src: 'pics/osobnyak/os (1).png' },
+          { src: 'pics/osobnyak/os (2).png' },
+          { src: 'pics/osobnyak/os (3).png' },
+          { src: 'pics/osobnyak/os (4).png' },
+        ]"
+      />
+
+      <MinorPage
+        prime_caption_text="LEVERPRESSO"
+        minor_caption_text="Landing page for Kickstarters` project. Eco-friendly espresso maker."
+        :images="[
+          { src: 'pics/lp/lp (1).jpg' },
+          { src: 'pics/lp/lp (2).jpg' },
+          { src: 'pics/lp/lp (3).jpg' },
+          { src: 'pics/lp/lp (4).jpg' },
+        ]"
+      />
+
+      <MinorPage
+        prime_caption_text="KYIVCORNER"
+        minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
+        :images="[
+          { src: 'pics/kc/kc (1).png' },
+          { src: 'pics/kc/kc (2).png' },
+          { src: 'pics/kc/kc (3).png' },
+          { src: 'pics/kc/kc (4).png' },
+        ]"
+      />
+    </div>
+
+    <div class="logo" @click="on_logo_click">
+      <div class="content">N.P.</div>
+    </div>
+
+    <div class="arrow_separator">
+      <div class="body"></div>
+      <div class="arrow">
+        <div class="a"></div>
+        <div class="b"></div>
+      </div>
+    </div>
+
+    <div class="about" @click="on_about_me_click">
+      <div class="content">About Me</div>
     </div>
 
   </div>
@@ -48,8 +106,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import PrimePage from "./components/Pages/PrimePage.vue"
+import MinorPage from "./components/Pages/MinorPage.vue"
 import { TweenMax, TimelineMax } from "gsap"
-import { throttle } from "lodash-es"
+import { throttle, forEach } from "lodash-es"
 
 import SplashScreen from "./components/SplashScreen.vue"
 
@@ -58,24 +117,23 @@ export default Vue.extend({
 
   components: {
     PrimePage,
+    MinorPage,
     SplashScreen
   },
 
   mounted () {
     this.setup_animations()
     let prev_time = +new Date()
-
-    setInterval(()=>{
-      let now = +new Date()
-      this.$store.state.shader_time += (now - prev_time) / 1000000
-      prev_time = now
-      this.$store.state.shader_time = this.$store.state.shader_time % 10000000
-    }, 1000/60)
+   
   },
 
   computed: {
-    total_pages_count () {
-      let pages = this.$refs.pages_wrapper.querySelectorAll(".page")
+    total_prime_pages_count () {
+      let pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+      return pages.length
+    },
+    total_minor_pages_count () {
+      let pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
       return pages.length
     }
   },
@@ -83,25 +141,38 @@ export default Vue.extend({
 
   data: () => {
     let appearing_animation = new TimelineMax()
+    let minor_page_appearing_animation = new TimelineMax()
+    let minor_page_disappearing_animation = new TimelineMax()
+
     appearing_animation.pause()
+    minor_page_appearing_animation.pause()
+    minor_page_disappearing_animation.pause()
 
     return {
-      prev_page_index: 0,
-      active_page_index: 0,
+      prev_prime_page_index: 0,
+      active_prime_page_index: 0,
+      prev_minor_page_index: 0,
+      active_minor_page_index: 0,
       last_scroll_direction: 1,
       scroll_tween_duration: 0.777,
-      scroll_tween_easing: "Power4.easeInOut",
+      scroll_tween_easing: "Power3.easeInOut",
+      minor_page_animation_duration: 0.555,
+      minor_page_animation_easing: "Power3.easeInOut",
+      minor_page_shown: false,
+      active_minor_page: "",
       scroll_tween_a: null,
       scroll_tween_b: null,
-      appearing_animation
+      appearing_animation,
+      minor_page_appearing_animation,
+      minor_page_disappearing_animation
     }
   },
 
   watch: {
-    active_page_index ( value ) {
-      let pages = this.$refs.pages_wrapper.querySelectorAll(".page")
-      let page = pages[value]
-      let prev_page = pages[this.prev_page_index]
+    active_prime_page_index ( value ) {
+      let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+      let page = prime_pages[value]
+      let prev_page = prime_pages[this.prev_prime_page_index]
 
       if (this.scroll_tween_a !== null){
         this.scroll_tween_a.kill()
@@ -171,57 +242,230 @@ export default Vue.extend({
       // this.$refs.root.scrollLeft = value* 1000
 
       console.log(value)
+    },
+    active_minor_page_index ( value ) {
+      let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
+      let page = minor_pages[value]
+      let prev_page = minor_pages[this.prev_minor_page_index]
+
+      if (this.scroll_tween_a !== null){
+        this.scroll_tween_a.kill()
+        this.scroll_tween_a = null
+      }
+
+      if (this.scroll_tween_b !== null){
+        this.scroll_tween_b.kill()
+        this.scroll_tween_b = null
+      }
+
+      switch ( this.last_scroll_direction ) {
+        case 1:
+
+          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
+            xPercent: 100,
+            opacity: 0
+          }, {
+            xPercent: 0,
+            opacity: 1,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_a = null
+            }
+          } )
+
+          this.scroll_tween_b =TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
+            xPercent: 0,
+            opacity: 1,
+          }, {
+            xPercent: -100,
+            opacity: 0,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_b = null
+            }
+          } )
+          
+        break;
+        case -1:
+          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
+            xPercent: -100,
+            opacity: 0,
+          }, {
+            xPercent: 0,
+            opacity: 1,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_a = null
+            }
+          } )
+
+          this.scroll_tween_b = TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
+            xPercent: 0,
+            opacity: 1
+          }, {
+            xPercent: 100,
+            opacity: 0,
+            ease: this.scroll_tween_easing,
+            onComplete: ()=>{
+              this.scroll_tween_b = null
+            }
+          } )
+        break;
+      }
+
+      // this.$refs.root.scrollLeft = value* 1000
+
+      console.log(value)
+    },
+    minor_page_shown ( new_value ) {
+   
+      switch ( new_value ) {
+        case true:
+             this.minor_page_appearing_animation.restart()
+          break;
+
+        case false:
+            this.minor_page_disappearing_animation.restart()
+          break;
+      } 
     }
   },
 
   methods: {
-    on_mousewheel: function( evt ){
+    rotate_index(increase, current, max){
+      let result = current
+      if (increase) {
+        result++
+      } else {
+        result--
+      }
+
+      if (result>=max) result = 0
+      if (result<0) result = max - 1
+      
+      return result
+
+    },
+    on_prime_pages_wrapper_mousewheel: function( evt ){
       if (this.scroll_tween_a !== null && this.scroll_tween_b !== null) {
         return
       }
 
-      let new_index = this.active_page_index
-      if (evt.deltaY > 0){
-        new_index++
-        this.last_scroll_direction = 1
-      } else {
-        new_index--
-        this.last_scroll_direction = -1
-      }
 
-      if (new_index >= this.total_pages_count){
-        new_index = 0
-        
-      }
+      this.last_scroll_direction = evt.deltaY > 0 ? 1 : -1
+      let new_index = this.rotate_index(evt.deltaY > 0, this.active_prime_page_index, this.total_prime_pages_count)
 
-      if (new_index < 0){
-        new_index = this.total_pages_count - 1
-      }
-
-      this.prev_page_index = this.active_page_index
-      this.active_page_index = new_index
+      this.prev_prime_page_index = this.active_prime_page_index
+      this.active_prime_page_index = new_index
     },
     setup_animations () {
-      this.appearing_animation.fromTo(this.$refs.pages_wrapper, 1, {
+      this.appearing_animation.fromTo(this.$refs.prime_pages_wrapper, 1, {
         yPercent: 0
       }, {
         yPercent: 0   
       })
+
+      this.minor_page_appearing_animation.fromTo(this.$refs.minor_pages_wrapper, this.minor_page_animation_duration, {
+        yPercent: 100,
+        opacity: 0
+      }, {
+        yPercent: 0,
+        opacity: 1,
+        onStart: ()=> { this.$refs.minor_pages_wrapper.style.display="flex" },
+        ease: this.minor_page_animation_easing
+      })
+
+      this.minor_page_disappearing_animation.fromTo(this.$refs.minor_pages_wrapper, this.minor_page_animation_duration, {
+        yPercent: 0,
+        opacity: 1,
+      }, {
+        yPercent: 100,
+        opacity: 0,
+        onComplete: ()=> { this.$refs.minor_pages_wrapper.style.display="none" },
+        ease: this.minor_page_animation_easing
+      })
     },
     on_splashscreen_before_disappearing () {
       // this.appearing_animation.resume()
-    }
+    },
+    on_logo_click () {
+      this.minor_page_shown = false
+      console.log(1)
+    },
+    on_about_me_click () {
+      console.log(2)
+    },
+    open_minor_page (page_index: String){
+      this.minor_page_shown = true
+      this.set_active_minor_page(page_index)
+      // this.active_minor_page = page_id
+    },
+    close_minor_page () {
+      this.minor_page_shown = false
+    },
+    set_active_minor_page( index ) {
+      let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
+      console.log(minor_pages, index)
+
+      forEach(minor_pages, (page_el, _index)=>{
+        if (index !== _index){
+          page_el.style.opacity = 0
+          page_el.style.transform = "translateX(-100%)"
+        } else {
+          page_el.style.opacity = 1
+          page_el.style.transform = "translateX(0%)"
+        }
+      })
+
+
+    } 
   }
 });
 </script>
 
 
 <style lang="sass">
+
+  ::-webkit-scrollbar 
+    width: 2px
+    height: 2px
+  
+  ::-webkit-scrollbar-button 
+    width: 0px
+    height: 0px
+  
+  ::-webkit-scrollbar-thumb 
+    background: #e1e1e1
+    border: 0px none #ffffff
+    border-radius: 50px
+  
+  ::-webkit-scrollbar-thumb:hover 
+    background: #ffffff
+  
+  ::-webkit-scrollbar-thumb:active 
+    background: #000000
+  
+  ::-webkit-scrollbar-track 
+    background: #666666
+    border: 0px none #ffffff
+    border-radius: 50px
+  
+  ::-webkit-scrollbar-track:hover 
+    background: #666666
+  
+  ::-webkit-scrollbar-track:active 
+    background: #333333
+  
+  ::-webkit-scrollbar-corner 
+    background: transparent
+  
+
   html, body 
     width: 100%
     height: 100%
     margin: 0
     position: relative
+    overflow: hidden!important
 
   .app-root 
     background: #202020
@@ -231,7 +475,37 @@ export default Vue.extend({
     flex-direction: row
     width: 100vw
 
-    .pages_wrapper
+    .arrow_separator 
+      position: fixed
+      left: 120px
+      top: 50%
+      transform: translateY(-50%)
+      .body 
+        background-color: #47FFBD
+        width: 50px
+        height: 2px
+
+    .logo, .about
+      left: 120px
+      position: fixed
+      top: 48px
+      cursor: pointer
+
+      .content 
+        font-family: 'Montserrat', sand-serif
+        font-style: normal
+        font-weight: 800
+        font-size: 18px
+        line-height: 22px
+        text-transform: uppercase
+        color: #ffffff
+
+    .about 
+      bottom: 48px
+      top: auto
+
+    .prime_pages_wrapper
+      flex-shrink: 0
       width: 100%
       height: 100%
       display: flex
@@ -249,7 +523,32 @@ export default Vue.extend({
 
         &.main_page 
           opacity: 1
-        
+
+
+    .minor_pages_wrapper 
+      opacity: 0
+      display: none    
+      width: 100%
+      height: 100vh
+      display: flex
+      flex-direction: row
+      top: 0
+      left: 0
+      background: #202020
+      flex-shrink: 0
+      position: absolute
+      display: none
+
+      .page 
+        flex-shrink: 0
+        width: 100vw
+        height: 100vh
+        overflow-y: auto
+        position: absolute
+        top: 0
+        left: 0
+        opacity: 0
+        background: #202020
         
 
 </style>
