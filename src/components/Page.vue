@@ -10,25 +10,25 @@
 
 
 <script lang="ts">
+
 import Vue from 'vue';
+import BasicComponent from "./BasicComponent.vue"
+import Include from "./Include"
+import { TweenMax } from "gsap"
+
 
 export default Vue.extend({
-  name: 'PrimePage',
-
-  components: {
-
+  name: 'Page',
+  mixins: [ BasicComponent ], 
+  mounted () {
+    this.$component = this
   },
-
   props: {
     page_id: {
       type: String,
       default: ()=> "page"
-    }
-  },
-
-  data: () => ({
-    //
-  }),
+    },
+  }
 });
 </script>
 
@@ -37,8 +37,6 @@ export default Vue.extend({
     .page 
         width: 100%
         min-height: 100%
-        display: grid
-        grid-template-columns: 1fr 1fr 1fr
-        grid-template-rows: 1fr 1fr
+
 
 </style>

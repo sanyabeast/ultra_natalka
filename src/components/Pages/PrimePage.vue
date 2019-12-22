@@ -5,12 +5,19 @@
         <Ticker 
                 :text="ticker_text"
                 :animation_speed="ticker_animation_speed"
+                ref="ticker"
+                @click="on_image_click"
+                :active="ticker_active"
+
         />
 
         <div class="content">
                 <ImageComponent
+                        ref="image"
                         :image_src="page_image_src"
                         @click="on_image_click"
+                        @hover="ticker_active = true"
+                        @pointerout="ticker_active = false"
                 />
 
                 <div class="foot">
@@ -61,7 +68,7 @@ export default Vue.extend({
           },
           ticker_animation_speed: {
                   type: Number,
-                  default: ()=> 5
+                  default: () => 5
           },
           page_image_src: {
                   type: String,
@@ -73,7 +80,7 @@ export default Vue.extend({
           }
   },
   data: () => ({
-    //
+    ticker_active: false
   }),
   methods: {
           on_image_click () {
@@ -97,9 +104,14 @@ export default Vue.extend({
         justify-content: center
 
         .ticker 
-          position: absolute
-          top: 0
-          width: 100vh  
+                position: absolute
+                top: -160px
+                left: auto
+                right: 264px
+                width: 100vh
+                transform: rotate(90deg) translateX(100%)
+                transform-origin: bottom right
+                cursor: pointer
 
         .content 
                 display: flex

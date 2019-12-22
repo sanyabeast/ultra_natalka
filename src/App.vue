@@ -4,10 +4,8 @@
     ref="root"
     >
 
-    
-
     <SplashScreen
-      :enabled="false"
+      :enabled="true"
       @before_disappearing="on_splashscreen_before_disappearing"
     />
 
@@ -51,6 +49,8 @@
       <MinorPage
         prime_caption_text="OSOBNYAK"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
+        :animate_opacity="false"
+        @next_clicked="on_minor_page_next_clicked(0)"
         :images="[
           { src: 'pics/osobnyak/os (1).png' },
           { src: 'pics/osobnyak/os (2).png' },
@@ -62,6 +62,8 @@
       <MinorPage
         prime_caption_text="LEVERPRESSO"
         minor_caption_text="Landing page for Kickstarters` project. Eco-friendly espresso maker."
+        :animate_opacity="false"
+        @next_clicked="on_minor_page_next_clicked(1)"
         :images="[
           { src: 'pics/lp/lp (1).jpg' },
           { src: 'pics/lp/lp (2).jpg' },
@@ -73,6 +75,8 @@
       <MinorPage
         prime_caption_text="KYIVCORNER"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
+        :animate_opacity="false"
+        @next_clicked="on_minor_page_next_clicked(2)"
         :images="[
           { src: 'pics/kc/kc (1).png' },
           { src: 'pics/kc/kc (2).png' },
@@ -98,6 +102,26 @@
       <div class="content">About Me</div>
     </div>
 
+    <Page 
+      class="about_page"
+      ref="about_page"
+    >
+
+      <ticker
+        text="natasha.pnsnk@gmail.com"
+      />
+      <div class="content">
+        <div class="head">
+          <div class="text">Hello!</div>
+          <div class="text">My name is Natalya Panasenko. I am web designer from Kyiv.</div>
+        </div>
+
+        <div class="foot">
+          <div class="text">contact me at</div>
+        </div>
+      </div>
+    </Page>
+
   </div>
 </template>
 
@@ -105,8 +129,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import Include from "./components/Include"
 import PrimePage from "./components/Pages/PrimePage.vue"
+import Page from "./components/Page.vue"
 import MinorPage from "./components/Pages/MinorPage.vue"
+import Ticker from "./components/Ticker.vue"
 import { TweenMax, TimelineMax } from "gsap"
 import { throttle, forEach } from "lodash-es"
 
@@ -116,8 +143,10 @@ export default Vue.extend({
   name: 'App',
 
   components: {
+    Page,
     PrimePage,
     MinorPage,
+    Ticker,
     SplashScreen
   },
 
@@ -149,6 +178,7 @@ export default Vue.extend({
     minor_page_disappearing_animation.pause()
 
     return {
+      about_page_visible: false,
       prev_prime_page_index: 0,
       active_prime_page_index: 0,
       prev_minor_page_index: 0,
@@ -169,170 +199,74 @@ export default Vue.extend({
   },
 
   watch: {
+    about_page_visible ( new_value ) {
+        console.log(new_value, this)
+        switch (new_value) {
+          case true:
+              this.$refs.about_page.$component.appear_from(Include.Direction.Left)
+            break;
+
+          case false:
+              this.$refs.about_page.$component.disappear_to(Include.Direction.Left)
+            break;
+        }
+    },
     active_prime_page_index ( value ) {
       let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
       let page = prime_pages[value]
       let prev_page = prime_pages[this.prev_prime_page_index]
 
-      if (this.scroll_tween_a !== null){
-        this.scroll_tween_a.kill()
-        this.scroll_tween_a = null
-      }
-
-      if (this.scroll_tween_b !== null){
-        this.scroll_tween_b.kill()
-        this.scroll_tween_b = null
-      }
 
       switch ( this.last_scroll_direction ) {
+
         case 1:
-
-          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
-            xPercent: 100,
-            opacity: 0
-          }, {
-            xPercent: 0,
-            opacity: 1,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_a = null
-            }
-          } )
-
-          this.scroll_tween_b =TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
-            xPercent: 0,
-            opacity: 1,
-          }, {
-            xPercent: -100,
-            opacity: 0,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_b = null
-            }
-          } )
-          
+          page.$component.appear_from(Include.Direction.Right)
+          prev_page.$component.disappear_to(Include.Direction.Left)
         break;
         case -1:
-          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
-            xPercent: -100,
-            opacity: 0,
-          }, {
-            xPercent: 0,
-            opacity: 1,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_a = null
-            }
-          } )
-
-          this.scroll_tween_b = TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
-            xPercent: 0,
-            opacity: 1
-          }, {
-            xPercent: 100,
-            opacity: 0,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_b = null
-            }
-          } )
+          page.$component.appear_from(Include.Direction.Left)
+          prev_page.$component.disappear_to(Include.Direction.Right)
         break;
       }
-
-      // this.$refs.root.scrollLeft = value* 1000
-
-      console.log(value)
     },
     active_minor_page_index ( value ) {
       let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
       let page = minor_pages[value]
       let prev_page = minor_pages[this.prev_minor_page_index]
 
-      if (this.scroll_tween_a !== null){
-        this.scroll_tween_a.kill()
-        this.scroll_tween_a = null
-      }
-
-      if (this.scroll_tween_b !== null){
-        this.scroll_tween_b.kill()
-        this.scroll_tween_b = null
-      }
-
       switch ( this.last_scroll_direction ) {
         case 1:
 
-          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
-            xPercent: 100,
-            opacity: 0
-          }, {
-            xPercent: 0,
-            opacity: 1,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_a = null
-            }
-          } )
-
-          this.scroll_tween_b =TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
-            xPercent: 0,
-            opacity: 1,
-          }, {
-            xPercent: -100,
-            opacity: 0,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_b = null
-            }
-          } )
+          page.$component.appear_from(Include.Direction.Right)
+          prev_page.$component.disappear_to(Include.Direction.Left)
           
         break;
         case -1:
-          this.scroll_tween_a = TweenMax.fromTo( page, this.scroll_tween_duration, {
-            xPercent: -100,
-            opacity: 0,
-          }, {
-            xPercent: 0,
-            opacity: 1,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_a = null
-            }
-          } )
-
-          this.scroll_tween_b = TweenMax.fromTo( prev_page, this.scroll_tween_duration, {
-            xPercent: 0,
-            opacity: 1
-          }, {
-            xPercent: 100,
-            opacity: 0,
-            ease: this.scroll_tween_easing,
-            onComplete: ()=>{
-              this.scroll_tween_b = null
-            }
-          } )
+          page.$component.appear_from(Include.Direction.Left)
+          prev_page.$component.disappear_to(Include.Direction.Right)
         break;
       }
-
-      // this.$refs.root.scrollLeft = value* 1000
-
-      console.log(value)
     },
     minor_page_shown ( new_value ) {
-   
+      let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
+      let active_page = minor_pages[ this.active_minor_page_index ]
+
+      console.log(active_page, new_value)
+
       switch ( new_value ) {
         case true:
-             this.minor_page_appearing_animation.restart()
+            active_page.$component.appear_from(Include.Direction.Down)
           break;
 
         case false:
-            this.minor_page_disappearing_animation.restart()
+            active_page.$component.disappear_to(Include.Direction.Down)
           break;
       } 
     }
   },
 
   methods: {
-    rotate_index(increase, current, max){
+    rotate_index(increase: Boolean, current: Number, max: Number): Number {
       let result = current
       if (increase) {
         result++
@@ -347,11 +281,6 @@ export default Vue.extend({
 
     },
     on_prime_pages_wrapper_mousewheel: function( evt ){
-      if (this.scroll_tween_a !== null && this.scroll_tween_b !== null) {
-        return
-      }
-
-
       this.last_scroll_direction = evt.deltaY > 0 ? 1 : -1
       let new_index = this.rotate_index(evt.deltaY > 0, this.active_prime_page_index, this.total_prime_pages_count)
 
@@ -364,40 +293,21 @@ export default Vue.extend({
       }, {
         yPercent: 0   
       })
-
-      this.minor_page_appearing_animation.fromTo(this.$refs.minor_pages_wrapper, this.minor_page_animation_duration, {
-        yPercent: 100,
-        opacity: 0
-      }, {
-        yPercent: 0,
-        opacity: 1,
-        onStart: ()=> { this.$refs.minor_pages_wrapper.style.display="flex" },
-        ease: this.minor_page_animation_easing
-      })
-
-      this.minor_page_disappearing_animation.fromTo(this.$refs.minor_pages_wrapper, this.minor_page_animation_duration, {
-        yPercent: 0,
-        opacity: 1,
-      }, {
-        yPercent: 100,
-        opacity: 0,
-        onComplete: ()=> { this.$refs.minor_pages_wrapper.style.display="none" },
-        ease: this.minor_page_animation_easing
-      })
     },
     on_splashscreen_before_disappearing () {
       // this.appearing_animation.resume()
     },
     on_logo_click () {
+      this.about_page_visible = false
       this.minor_page_shown = false
       console.log(1)
     },
     on_about_me_click () {
-      console.log(2)
+      this.about_page_visible = true
     },
     open_minor_page (page_index: String){
-      this.minor_page_shown = true
       this.set_active_minor_page(page_index)
+      this.minor_page_shown = true
       // this.active_minor_page = page_id
     },
     close_minor_page () {
@@ -405,7 +315,6 @@ export default Vue.extend({
     },
     set_active_minor_page( index ) {
       let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
-      console.log(minor_pages, index)
 
       forEach(minor_pages, (page_el, _index)=>{
         if (index !== _index){
@@ -418,7 +327,13 @@ export default Vue.extend({
       })
 
 
-    } 
+    },
+    on_minor_page_next_clicked ( page_index ){
+      this.prev_minor_page_index = page_index
+      let new_index = this.rotate_index(true, page_index, 3)
+      this.last_scroll_direction = 1
+      this.active_minor_page_index = new_index
+    }
   }
 });
 </script>
@@ -475,11 +390,15 @@ export default Vue.extend({
     flex-direction: row
     width: 100vw
 
+    * 
+      user-select: none
+
     .arrow_separator 
       position: fixed
       left: 120px
       top: 50%
       transform: translateY(-50%)
+      z-index: 1
       .body 
         background-color: #47FFBD
         width: 50px
@@ -490,6 +409,7 @@ export default Vue.extend({
       position: fixed
       top: 48px
       cursor: pointer
+      z-index: 1
 
       .content 
         font-family: 'Montserrat', sand-serif
@@ -503,6 +423,45 @@ export default Vue.extend({
     .about 
       bottom: 48px
       top: auto
+
+    .about_page
+      position: absolute
+      top: 0
+      left: 0
+      width: 100vw
+      height: 100vh
+      background: #202020
+      display: flex
+      flex-direction: column
+      align-items: center
+      justify-content: center
+      visibility: hidden
+
+      .ticker 
+        position: absolute
+        left: auto
+        width: 100vw
+        transform-origin: bottom right
+        cursor: pointer
+        top: 50%
+        transform: translateY(27%)
+
+        .chunk
+          animation-duration: 30s
+
+      > .content 
+        display: flex
+        flex-direction: column
+
+        .head 
+          margin-bottom: 92px
+
+        .text
+          font-family: 'Montserrat', sans-serif
+          font-style: normal
+          font-weight: normal
+          font-size: 18px
+          color: #FFFFFF
 
     .prime_pages_wrapper
       flex-shrink: 0
@@ -526,10 +485,7 @@ export default Vue.extend({
 
 
     .minor_pages_wrapper 
-      opacity: 0
-      display: none    
-      width: 100%
-      height: 100vh
+      width: 100%0
       display: flex
       flex-direction: row
       top: 0
@@ -537,9 +493,9 @@ export default Vue.extend({
       background: #202020
       flex-shrink: 0
       position: absolute
-      display: none
 
       .page 
+        position: absolute
         flex-shrink: 0
         width: 100vw
         height: 100vh
@@ -547,8 +503,8 @@ export default Vue.extend({
         position: absolute
         top: 0
         left: 0
-        opacity: 0
         background: #202020
+        visibility: hidden
         
 
 </style>

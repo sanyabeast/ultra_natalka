@@ -5,25 +5,28 @@
         <Ticker 
                 :text="ticker_text"
                 :animation_speed="ticker_animation_speed"
+                @click="$emit('next_clicked')"
         />
 
-        <div class="content">
-                <div class="captions">
-                        <div 
-                                class="prime_caption"
-                                v-html="prime_caption_text"></div>
-                        
-                        <div 
-                                class="minor_caption"
-                                v-html="minor_caption_text"></div>
-                </div>
+        <div class="page_content">
+                <div class="content">
+                        <div class="captions">
+                                <div 
+                                        class="prime_caption"
+                                        v-html="prime_caption_text"></div>
+                                
+                                <div 
+                                        class="minor_caption"
+                                        v-html="minor_caption_text"></div>
+                        </div>
 
-                <div class="images">
-                        <image-component
-                                v-for="(item, index) in images"
-                                v-bind:key="index"
-                                :image_src="item.src"
-                        />
+                        <div class="images">
+                                <image-component
+                                        v-for="(item, index) in images"
+                                        v-bind:key="index"
+                                        :image_src="item.src"
+                                />
+                        </div>
                 </div>
         </div>
 
@@ -52,7 +55,7 @@ export default Vue.extend({
           },
           ticker_text: {
                   type: String,
-                  default: ()=> "TEXT"
+                  default: ()=> "NEXT"
           },
           images: {
                   type: Array,
@@ -60,11 +63,11 @@ export default Vue.extend({
           },
           prime_caption_text: {
                   type: String,
-                  default: ()=> "KEKEK"
+                  default: ()=> ""
           },
           minor_caption_text: {
                   type: String,
-                  default: ()=> "KEKEK"
+                  default: ()=> ""
           },
   },
   data: () => ({
@@ -83,51 +86,61 @@ export default Vue.extend({
         flex-direction: row-reverse
         align-items: flex-start
         justify-content: center
-        overflow-x: hidden
-        overflow-y: auto
+        overflow: hidden
         
         .ticker 
-          position: absolute
-          top: 0
-          width: 100vh  
+                position: absolute
+                top: -160px
+                left: auto
+                right: 264px
+                width: 100vh
+                transform: rotate(90deg) translateX(100%)
+                transform-origin: bottom right
+                cursor: pointer
 
-        .content 
-                display: flex
-                flex-direction: column
-                align-items: center
-
-                .captions       
+        .page_content 
+                overflow-x: hidden
+                overflow-y: auto
+                width: 100%
+                height: 100%
+        
+                .content 
                         display: flex
                         flex-direction: column
-                        align-items: flex-start
-                        flex-shrink: 0
-                        margin-top: 20vh
+                        align-items: center
 
-                        .prime_caption
-                                font-family: 'Montserrat', sans-serif
-                                font-style: normal
-                                font-weight: 900
-                                font-size: 96px
-                                font-variant: small-caps
-                                color: #FFFFFF
-                                mix-blend-mode: normal
-                                box-sizing: border-box
+                        .captions       
+                                display: flex
+                                flex-direction: column
+                                align-items: flex-start
+                                flex-shrink: 0
+                                margin-top: 20vh
 
-                        .minor_caption
-                                font-family: 'Montserrat', sans-serif
-                                font-style: normal
-                                font-weight: normal
-                                font-size: 18px
-                                line-height: 28px
-                                color: #FFFFFF
+                                .prime_caption
+                                        font-family: 'Montserrat', sans-serif
+                                        font-style: normal
+                                        font-weight: 900
+                                        font-size: 96px
+                                        font-variant: small-caps
+                                        color: #FFFFFF
+                                        mix-blend-mode: normal
+                                        box-sizing: border-box
 
-                .images 
-                        display: flex
-                        flex-direction: column
-                        flex-shrink: 0
+                                .minor_caption
+                                        font-family: 'Montserrat', sans-serif
+                                        font-style: normal
+                                        font-weight: normal
+                                        font-size: 18px
+                                        line-height: 28px
+                                        color: #FFFFFF
+
+                        .images 
+                                display: flex
+                                flex-direction: column
+                                flex-shrink: 0
 
 
-                        .image_component 
-                                margin: 72px 0
+                                .image_component 
+                                        margin: 72px 0
 
 </style>

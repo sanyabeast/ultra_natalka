@@ -4,6 +4,7 @@
         ref="root"
         @click="on_click"
         @mouseover="on_hover"
+        @mouseovut="on_out"
     >
         <img
                 ref="image_element"
@@ -54,6 +55,9 @@ export default Vue.extend({
           },
           on_hover () {
                   this.$emit("hover")
+          },
+          on_out () {
+                  this.$emit("pointerout")
           }
   }
 });
