@@ -5,7 +5,7 @@
     >
 
     <SplashScreen
-      :enabled="true"
+      :enabled="false"
       @before_disappearing="on_splashscreen_before_disappearing"
     />
 
@@ -49,7 +49,7 @@
       <MinorPage
         prime_caption_text="OSOBNYAK"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
-        :animate_opacity="false"
+        :appearing_animation_opacity="false"
         @next_clicked="on_minor_page_next_clicked(0)"
         :images="[
           { src: 'pics/osobnyak/os (1).png' },
@@ -62,7 +62,7 @@
       <MinorPage
         prime_caption_text="LEVERPRESSO"
         minor_caption_text="Landing page for Kickstarters` project. Eco-friendly espresso maker."
-        :animate_opacity="false"
+        :appearing_animation_opacity="false"
         @next_clicked="on_minor_page_next_clicked(1)"
         :images="[
           { src: 'pics/lp/lp (1).jpg' },
@@ -75,7 +75,7 @@
       <MinorPage
         prime_caption_text="KYIVCORNER"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
-        :animate_opacity="false"
+        :appearing_animation_opacity="false"
         @next_clicked="on_minor_page_next_clicked(2)"
         :images="[
           { src: 'pics/kc/kc (1).png' },
@@ -90,13 +90,10 @@
       <div class="content">N.P.</div>
     </div>
 
-    <div class="arrow_separator">
-      <div class="body"></div>
-      <div class="arrow">
-        <div class="a"></div>
-        <div class="b"></div>
-      </div>
-    </div>
+    <Arrow
+      :enabled="minor_page_shown"
+      @click="on_minor_page_prev_clicked"
+    />
 
     <div class="about" @click="on_about_me_click">
       <div class="content">About Me</div>
@@ -105,6 +102,7 @@
     <Page 
       class="about_page"
       ref="about_page"
+      :appearing_animation_opacity="false"
     >
 
       <ticker
@@ -133,6 +131,7 @@ import Include from "./components/Include"
 import PrimePage from "./components/Pages/PrimePage.vue"
 import Page from "./components/Page.vue"
 import MinorPage from "./components/Pages/MinorPage.vue"
+import Arrow from "./components/Arrow.vue"
 import Ticker from "./components/Ticker.vue"
 import { TweenMax, TimelineMax } from "gsap"
 import { throttle, forEach } from "lodash-es"
@@ -146,6 +145,7 @@ export default Vue.extend({
     Page,
     PrimePage,
     MinorPage,
+    Arrow,
     Ticker,
     SplashScreen
   },
@@ -189,7 +189,6 @@ export default Vue.extend({
       minor_page_animation_duration: 0.555,
       minor_page_animation_easing: "Power3.easeInOut",
       minor_page_shown: false,
-      active_minor_page: "",
       scroll_tween_a: null,
       scroll_tween_b: null,
       appearing_animation,
@@ -200,7 +199,6 @@ export default Vue.extend({
 
   watch: {
     about_page_visible ( new_value ) {
-        console.log(new_value, this)
         switch (new_value) {
           case true:
               this.$refs.about_page.$component.appear_from(Include.Direction.Left)
@@ -236,14 +234,17 @@ export default Vue.extend({
 
       switch ( this.last_scroll_direction ) {
         case 1:
+          page.$component.scroll_to(0)
 
-          page.$component.appear_from(Include.Direction.Right)
           prev_page.$component.disappear_to(Include.Direction.Left)
+          page.$component.appear_from(Include.Direction.Right)
           
         break;
         case -1:
-          page.$component.appear_from(Include.Direction.Left)
+          page.$component.scroll_to(0)
+            
           prev_page.$component.disappear_to(Include.Direction.Right)
+          page.$component.appear_from(Include.Direction.Left)
         break;
       }
     },
@@ -251,7 +252,6 @@ export default Vue.extend({
       let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
       let active_page = minor_pages[ this.active_minor_page_index ]
 
-      console.log(active_page, new_value)
 
       switch ( new_value ) {
         case true:
@@ -281,6 +281,13 @@ export default Vue.extend({
 
     },
     on_prime_pages_wrapper_mousewheel: function( evt ){
+      let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+      let active_prime_page = prime_pages[ this.active_prime_page_index ]
+
+      if (active_prime_page.$component.is_animating){
+        return
+      }
+
       this.last_scroll_direction = evt.deltaY > 0 ? 1 : -1
       let new_index = this.rotate_index(evt.deltaY > 0, this.active_prime_page_index, this.total_prime_pages_count)
 
@@ -300,38 +307,28 @@ export default Vue.extend({
     on_logo_click () {
       this.about_page_visible = false
       this.minor_page_shown = false
-      console.log(1)
     },
     on_about_me_click () {
+      this.minor_page_shown = false
       this.about_page_visible = true
     },
     open_minor_page (page_index: String){
-      this.set_active_minor_page(page_index)
+      this.active_minor_page_index = page_index
       this.minor_page_shown = true
-      // this.active_minor_page = page_id
     },
-    close_minor_page () {
-      this.minor_page_shown = false
-    },
-    set_active_minor_page( index ) {
-      let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
-
-      forEach(minor_pages, (page_el, _index)=>{
-        if (index !== _index){
-          page_el.style.opacity = 0
-          page_el.style.transform = "translateX(-100%)"
-        } else {
-          page_el.style.opacity = 1
-          page_el.style.transform = "translateX(0%)"
-        }
-      })
-
-
-    },
-    on_minor_page_next_clicked ( page_index ){
-      this.prev_minor_page_index = page_index
+    on_minor_page_next_clicked ( page_index: Number ){
       let new_index = this.rotate_index(true, page_index, 3)
+      
+      this.prev_minor_page_index = page_index
       this.last_scroll_direction = 1
+      this.active_minor_page_index = new_index
+    },
+    on_minor_page_prev_clicked (){
+      let page_index = this.active_minor_page_index
+      let new_index = this.rotate_index(false, page_index, 3)
+
+      this.prev_minor_page_index = page_index
+      this.last_scroll_direction = -1
       this.active_minor_page_index = new_index
     }
   }
@@ -392,17 +389,6 @@ export default Vue.extend({
 
     * 
       user-select: none
-
-    .arrow_separator 
-      position: fixed
-      left: 120px
-      top: 50%
-      transform: translateY(-50%)
-      z-index: 1
-      .body 
-        background-color: #47FFBD
-        width: 50px
-        height: 2px
 
     .logo, .about
       left: 120px

@@ -8,7 +8,7 @@
                 @click="$emit('next_clicked')"
         />
 
-        <div class="page_content">
+        <div class="page_content" ref="page_content">
                 <div class="content">
                         <div class="captions">
                                 <div 
@@ -73,6 +73,11 @@ export default Vue.extend({
   data: () => ({
     //
   }),
+  methods: {
+          scroll_to ( scroll_pos ) {
+                this.$refs.page_content.scrollTop = 0
+          }
+  }
 });
 </script>
 
