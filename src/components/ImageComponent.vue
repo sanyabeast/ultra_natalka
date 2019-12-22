@@ -3,8 +3,8 @@
         class="image_component"
         ref="root"
         @click="on_click"
-        @mouseover="on_hover"
-        @mouseovut="on_out"
+        @mouseover="on_pointerover"
+        @mouseout="on_pointerout"
     >
         <img
                 ref="image_element"
@@ -21,6 +21,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { C } from "./Include"
 
 export default Vue.extend({
   name: 'ImageCompnent',
@@ -38,9 +39,9 @@ export default Vue.extend({
 
   data () {
           return {
-                  real_width: 0,
-                  real_height: 0,
-                  image_loaded: false
+                real_width: 0,
+                real_height: 0,
+                image_loaded: false
           }
   },
 
@@ -53,10 +54,10 @@ export default Vue.extend({
           on_click () {
                   this.$emit("click")
           },
-          on_hover () {
-                  this.$emit("hover")
+          on_pointerover () {
+                this.$emit("pointerover")
           },
-          on_out () {
+          on_pointerout () {
                   this.$emit("pointerout")
           }
   }

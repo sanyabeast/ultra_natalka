@@ -4,7 +4,6 @@
     >
         <Ticker 
                 :text="ticker_text"
-                :animation_speed="ticker_animation_speed"
                 @click="$emit('next_clicked')"
         />
 

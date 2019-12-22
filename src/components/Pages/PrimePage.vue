@@ -7,7 +7,7 @@
                 :animation_speed="ticker_animation_speed"
                 ref="ticker"
                 @click="on_image_click"
-                :active="ticker_active"
+                :enabled="ticker_active"
 
         />
 
@@ -16,7 +16,7 @@
                         ref="image"
                         :image_src="page_image_src"
                         @click="on_image_click"
-                        @hover="ticker_active = true"
+                        @pointerover="ticker_active = true"
                         @pointerout="ticker_active = false"
                 />
 

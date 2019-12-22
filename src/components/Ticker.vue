@@ -2,7 +2,7 @@
     <div
         class="ticker"
         v-bind:class="{
-            active: this.computed_active
+            enabled: hovered
         }"
         @mouseover="hovered = true"
         @mouseout="hovered = false"
@@ -42,16 +42,8 @@
 import Vue from "vue"
 export default Vue.extend({
     name: "Ticker",
-    computed: {
-        animation_speed_formatted () {
-            return `${this.animation_speed}s`
-        },
-        computed_active () {
-            return this.active || this.hovered
-        }
-    },
     props: {
-        active: {
+        enabled: {
             type: Boolean,
             default: ()=> false
         },
@@ -59,6 +51,13 @@ export default Vue.extend({
             type: String,
             default: ()=> "text"
         },
+    },
+    watch: {
+        enabled ( new_value ) {
+            console.log(1, new_value)
+            this.hovered = new_value           
+            console.log(this.hovered, this)
+        }
     },
     data () {
         return {
@@ -83,7 +82,7 @@ export default Vue.extend({
         overflow: hidden
         z-index: 2
         
-        &.active 
+        &.enabled 
             .content .chunk .text_wrapper p   
                 color: #70ffb5
 

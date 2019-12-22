@@ -40,7 +40,7 @@ export default Vue.extend({
                         height: 50%
                         transform: translate(-50%, -50%)
                         width: 100px
-                        height: 100px
+                        height: 300px
 
                 .body 
                         background-color: #47FFBD
