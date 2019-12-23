@@ -7,6 +7,7 @@
         @mouseout="on_pointerout"
     >
         <img
+                class="image_node"
                 ref="image_element"
                 v-bind:class="{
                         loaded: this.image_loaded
@@ -65,9 +66,14 @@ export default Vue.extend({
 </script>
 
 
-<style scoped lang="sass">
+<style lang="sass">
     .image_component 
-        img 
+        display: flex
+        alignt-items: center
+        justify-content: center
+        overflow: hidden
+
+        .image_node 
                 width: auto
                 height: 100%
                 opacity: 0

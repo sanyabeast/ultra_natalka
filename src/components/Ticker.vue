@@ -9,29 +9,29 @@
         @click="$emit(`click`)"
     >
         <div 
-            class="content"
+            class="ticker_content"
         >
             <div class="chunk n_0">
                 <div
                     class="text_wrapper n_0">
-                    <p v-html="text"></p>
+                    <p class="p_node" v-html="text"></p>
                 </div>
 
                 <div
                     class="text_wrapper n_1">
-                    <p v-html="text"></p>
+                    <p class="p_node"  v-html="text"></p>
                 </div>     
             </div>   
 
             <div class="chunk n_1">
                 <div
                     class="text_wrapper n_0">
-                    <p v-html="text"></p>
+                    <p class="p_node"  v-html="text"></p>
                 </div>
 
                 <div
                     class="text_wrapper n_1">
-                    <p v-html="text"></p>
+                    <p class="p_node"  v-html="text"></p>
                 </div>     
             </div>         
         </div>
@@ -54,9 +54,7 @@ export default Vue.extend({
     },
     watch: {
         enabled ( new_value ) {
-            console.log(1, new_value)
             this.hovered = new_value           
-            console.log(this.hovered, this)
         }
     },
     data () {
@@ -68,7 +66,7 @@ export default Vue.extend({
 </script>
 
 
-<style scoped lang="sass">
+<style lang="sass">
     @keyframes ticker_animation
         0% 
             transform: translateX(-100%)
@@ -83,10 +81,10 @@ export default Vue.extend({
         z-index: 2
         
         &.enabled 
-            .content .chunk .text_wrapper p   
-                color: #70ffb5
+            .ticker_content .chunk .text_wrapper p   
+                color: #47FFBD
 
-        .content 
+        .ticker_content 
             width: 100px
             height: 100% 
             display: flex
@@ -114,7 +112,7 @@ export default Vue.extend({
                         font-weight: 900
                         font-size: 132px
                         font-variant: small-caps
-                        text-shadow: -1px -1px 0 #70ffb5,  1px -1px 0 #70ffb5, -1px 1px 0 #70ffb5,  1px 1px 0 #70ffb5 
+                        text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
                         transform-origin: center center
                      
         

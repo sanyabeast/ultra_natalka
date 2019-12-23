@@ -347,19 +347,19 @@ export default Vue.extend({
     height: 0px
   
   ::-webkit-scrollbar-thumb 
-    background: #e1e1e1
+    background: #47ffbd
     border: 0px none #ffffff
     border-radius: 50px
   
   ::-webkit-scrollbar-thumb:hover 
-    background: #ffffff
+    background: #47ffbd
   
   ::-webkit-scrollbar-thumb:active 
-    background: #000000
+    background: #47ffbd
   
   ::-webkit-scrollbar-track 
-    background: #666666
-    border: 0px none #ffffff
+    background: #202020
+    border: 0px none #202020
     border-radius: 50px
   
   ::-webkit-scrollbar-track:hover 
@@ -429,11 +429,15 @@ export default Vue.extend({
         width: 100vw
         transform-origin: bottom right
         cursor: pointer
-        top: 50%
+        top: 55%
         transform: translateY(27%)
 
         .chunk
           animation-duration: 30s
+
+          .text_wrapper 
+            .p_node 
+              font-size: 96px
 
       > .content 
         display: flex
@@ -485,7 +489,6 @@ export default Vue.extend({
         flex-shrink: 0
         width: 100vw
         height: 100vh
-        overflow-y: auto
         position: absolute
         top: 0
         left: 0

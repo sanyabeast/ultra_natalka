@@ -81,7 +81,7 @@ export default Vue.extend({
 </script>
 
 
-<style scoped lang="sass">
+<style lang="sass">
     .minor_page 
         width: 100vw
         min-height: 100%

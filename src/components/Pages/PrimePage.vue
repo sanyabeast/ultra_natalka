@@ -93,7 +93,7 @@ export default Vue.extend({
 </script>
 
 
-<style scoped lang="sass">
+<style lang="sass">
     .prime-page 
         width: 100vw
         min-height: 100%
@@ -116,15 +116,23 @@ export default Vue.extend({
         .content 
                 display: flex
                 flex-direction: column
+                width: 100%
+                height: 100%
+                align-items: center
 
                 .image_component 
-                        height: 400px   
-                        margin-right: 64px
+                        height: auto
+                        width: auto
                         display: flex
                         cursor: pointer
+
+                        .image_node 
+                                width: 50vw
+                                height: auto
                 
                 .foot 
                         display: flex
+                        width: 50vw
                         flex-direction: row
                         align-items: flex-end
                         margin-top: 32px
@@ -140,5 +148,6 @@ export default Vue.extend({
                                 line-height: 22px
                                 text-transform: capitalize
                                 color: #FFFFFF
+                                transform: translateY(-4px)
 
 </style>
