@@ -1,7 +1,8 @@
 <template>
   <div 
-    class="app-root"
-    ref="root"
+      class="app-root"
+      ref="root"
+      @mousemove="on_mousemove"
     >
 
     <SplashScreen
@@ -178,6 +179,8 @@ export default Vue.extend({
     minor_page_disappearing_animation.pause()
 
     return {
+      prev_mousemove_time: +new Date(),
+      mousemove_min_delay: 1000 / 10,
       about_page_visible: false,
       prev_prime_page_index: 0,
       active_prime_page_index: 0,
@@ -266,6 +269,18 @@ export default Vue.extend({
   },
 
   methods: {
+    on_mousemove ( evt ) {
+      let now = +new Date()
+
+      if (now - this.prev_mousemove_time < this.mousemove_min_delay){
+        return
+      }
+
+      this.prev_mousemove_time = now
+
+      this.$store.state.mouse_position_x = evt.pageX
+      this.$store.state.mouse_position_y = evt.pageY
+    },
     rotate_index(increase: Boolean, current: Number, max: Number): Number {
       let result = current
       if (increase) {
@@ -389,6 +404,7 @@ export default Vue.extend({
 
     * 
       user-select: none
+      perspective: 500px
 
     .logo, .about
       left: 120px
@@ -437,7 +453,7 @@ export default Vue.extend({
 
           .text_wrapper 
             .p_node 
-              font-size: 96px
+              font-size: 62px
 
       > .content 
         display: flex
@@ -469,9 +485,11 @@ export default Vue.extend({
         top: 0
         left: 0
         opacity: 0
+        transform: translateY(100%)
 
         &.main_page 
           opacity: 1
+          transform: translate(0)
 
 
     .minor_pages_wrapper 

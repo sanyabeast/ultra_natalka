@@ -61,7 +61,17 @@ export default new Vuex.Store({
   state: {
     // shader_time: 0,
     // gl_renderer: gl_renderer,
+    mouse_position_x: 0,
+    mouse_position_y: 0,
     game_loop: new GameLoop().run()
+  },
+  getters: {
+    normalized_mouse_pos_x ( store ) {
+      return store.mouse_position_x / window.innerWidth
+    },
+    normalized_mouse_pos_y ( store ) {
+      return store.mouse_position_y / window.innerHeight
+    }
   },
   mutations: {
   },

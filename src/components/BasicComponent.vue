@@ -11,6 +11,7 @@
 <script lang="ts">
 
 import Vue from 'vue';
+import { mapState } from 'vuex'
 import Include from "./Include"
 import { TweenMax } from "gsap"
 
@@ -19,6 +20,32 @@ export default Vue.extend({
   name: 'BasicComponent',
   components: {
 
+  },
+  computed: mapState({
+    normalized_mouse_pos_x: function( state, getters ){
+      return getters.normalized_mouse_pos_x
+    },
+    normalized_mouse_pos_y: function( state, getters ){
+      return getters.normalized_mouse_pos_y
+    },
+    ...{
+      computed_rotation_prop () {
+        return `
+          rotate3d(${-(this.rotation_y - 0.5)}, ${(this.rotation_x - 0.5)}, 0, ${this.mouse_relative_perspective_rotation_power}deg)`
+      }
+    }
+  }),
+  watch: {
+    normalized_mouse_pos_x ( new_value ) {
+      if (this.use_mouse_relative_perspective_rotation3d){
+        this.rotation_x = new_value
+      }
+    },
+    normalized_mouse_pos_y ( new_value ) {
+      if (this.use_mouse_relative_perspective_rotation3d){
+        this.rotation_y = new_value
+      }
+    },
   },
   mounted () {
     this.$el.$component = this
@@ -35,10 +62,20 @@ export default Vue.extend({
     appearing_animation_ease: {
             type: String,
             default: ()=> "Power3.easeInOut"
+    },
+    use_mouse_relative_perspective_rotation3d: {
+      type: Boolean,
+      default: ()=> false
+    },
+    mouse_relative_perspective_rotation_power: {
+      type: Number,
+      default: ()=> 0
     }
   },
 
   data: () => ({
+    rotation_x: 0,
+    rotation_y: 0,
     is_animating: false,
     current_transform: { x: 0, y: 0, opacity: 0 },
     active_tween: null
@@ -75,7 +112,7 @@ export default Vue.extend({
             opacity: 1,
             y: 0,
             x:0,
-            onStart: ()=> { this.is_animating = true; this.$el.style.visibility="visible"},
+            onStart: ()=> { this.is_animating = true; this.$el.style.visibility="visible"; },
             onComplete: ()=> {this.is_animating = false; this.active_tween = null},
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
@@ -91,7 +128,7 @@ export default Vue.extend({
             opacity: 1,
             y: 0,
             x:0,
-            onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"},
+            onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"; },
             onComplete: ()=> {this.is_animating = false; this.active_tween = null},
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
@@ -105,7 +142,7 @@ export default Vue.extend({
           }, {
             opacity: 1,
             x: 0,
-            onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"},
+            onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"; },
             onComplete: ()=> {this.is_animating = false; this.active_tween = null},
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
@@ -119,7 +156,7 @@ export default Vue.extend({
           }, {
             opacity: 1,
             x: 0,
-            onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"},
+            onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"; },
             onComplete: ()=> {this.is_animating = false; this.active_tween = null},
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease

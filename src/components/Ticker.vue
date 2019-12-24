@@ -114,6 +114,7 @@ export default Vue.extend({
                         font-variant: small-caps
                         text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
                         transform-origin: center center
+                        letter-spacing: 0.1em
                      
         
 

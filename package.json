@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --host 192.168.1.138 --port 8000",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -34,7 +34,8 @@
     "three.js": "latest",
     "lodash-es": "latest",
     "gsap": "latest",
-    "lerp": "latest"
+    "lerp": "latest",
+    "hammerjs": "latest"
   },
   "eslintConfig": {
     "root": true,

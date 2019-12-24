@@ -15,10 +15,17 @@
                 <ImageComponent
                         ref="image"
                         :image_src="page_image_src"
+                        :use_mouse_relative_perspective_rotation3d="true"
+                        :mouse_relative_perspective_rotation_power="2"
                         @click="on_image_click"
-                        @pointerover="ticker_active = true"
+                        @pointerover="ticker_active = true; "
                         @pointerout="ticker_active = false"
-                />
+                >
+                        <!-- <SVGFilterComponent
+                                :filter_id="`image_filter_${page_index}`"
+                                ref="svg_filter"
+                        /> -->
+                </ImageComponent>
 
                 <div class="foot">
                                 <ListPositionIndicator 
@@ -48,6 +55,7 @@ import Page from "../Page.vue"
 import Ticker from "../Ticker.vue"
 import ImageComponent from "../ImageComponent.vue"
 import ListPositionIndicator from "../Slider/ListPositionIndicator.vue"
+import SVGFilterComponent from "../SVGFilter.vue"
 
 export default Vue.extend({
   name: 'PrimePage',
@@ -55,7 +63,8 @@ export default Vue.extend({
   components: {
           Ticker,
           ImageComponent,
-          ListPositionIndicator
+          ListPositionIndicator,
+        //   SVGFilterComponent
   },
   props: {
           page_index: {
@@ -119,6 +128,7 @@ export default Vue.extend({
                 width: 100%
                 height: 100%
                 align-items: center
+                perspective: 500px
 
                 .image_component 
                         height: auto
@@ -126,9 +136,16 @@ export default Vue.extend({
                         display: flex
                         cursor: pointer
 
+                        .hover_box 
+                                transition: background 0.25s ease-in
+
                         .image_node 
                                 width: 50vw
                                 height: auto
+
+                        &:hover 
+                                .hover_box
+                                        background: #47ffbd63
                 
                 .foot 
                         display: flex

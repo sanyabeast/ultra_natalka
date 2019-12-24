@@ -21,8 +21,10 @@
 
 <script lang="ts">
 import Vue from "vue"
+import BasicComponent from "../BasicComponent.vue"
 
 export default Vue.extend({
+    mixins: [BasicComponent],
     computed: {
        value_formatted: function(){
             return `0${this.value + 1}`

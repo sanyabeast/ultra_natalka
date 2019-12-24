@@ -7,7 +7,7 @@
                 @click="$emit('next_clicked')"
         />
 
-        <div class="page_content" ref="page_content">
+        <div class="page_content" ref="page_content" @scroll="on_scroll">
                 <div class="content">
                         <div class="captions">
                                 <div 
@@ -23,6 +23,9 @@
                                 <image-component
                                         v-for="(item, index) in images"
                                         v-bind:key="index"
+                                        v-bind:style="{
+                                              transform: `skew(${0}deg, ${scroll_speed * scroll_skew_power}deg)`
+                                        }"
                                         :image_src="item.src"
                                 />
                         </div>
@@ -47,6 +50,35 @@ export default Vue.extend({
           Ticker,
           ImageComponent,
   },
+  mounted () {
+
+          let prev_scroll_time = +new Date()
+          let min_time = 1000 / 30
+
+          this.$store.state.game_loop.add(()=>{
+                  if (!this.$refs.page_content){
+                        return
+                  }
+
+                  let now = +new Date()
+
+                  if ( now - prev_scroll_time < min_time ){
+                          return
+                  }
+
+                  prev_scroll_time = now
+
+                  let scroll_top = this.$refs.page_content.scrollTop
+                  let delta = scroll_top - this.scroll_pos
+                  this.scroll_pos = scroll_top
+
+                  if (delta < -100) delta = -100
+                  if (delta > 100) delta = 100
+
+                  this.scroll_speed = delta
+
+          })
+  },
   props: {
           page_index: {
                   type:Number,
@@ -70,12 +102,16 @@ export default Vue.extend({
           },
   },
   data: () => ({
-    //
+    scroll_pos: 0,
+    scroll_speed: 0,
+    scroll_skew_power: 0.025
   }),
   methods: {
-          scroll_to ( scroll_pos ) {
-                this.$refs.page_content.scrollTop = 0
-          }
+        on_scroll () {
+        },
+        scroll_to ( scroll_pos ) {
+              this.$refs.page_content.scrollTop = 0
+        }
   }
 });
 </script>
@@ -146,5 +182,6 @@ export default Vue.extend({
 
                                 .image_component 
                                         margin: 72px 0
+                                        transition: transform 0.333s ease-out
 
 </style>
