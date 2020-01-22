@@ -60,8 +60,8 @@ export default Vue.extend({
       default: ()=> 0.5
     },
     appearing_animation_ease: {
-            type: String,
-            default: ()=> "Power3.easeInOut"
+      type: String,
+      default: ()=> "Power3.easeInOut"
     },
     use_mouse_relative_perspective_rotation3d: {
       type: Boolean,
@@ -94,6 +94,8 @@ export default Vue.extend({
 
     },
     appear_from ( dir: Include.Direction, el: Element ) {
+
+      console.log(`appearing: ${this.page_id}`)
 
       let $el = el || this.$el
 
@@ -167,8 +169,10 @@ export default Vue.extend({
     },
     disappear_to ( dir: Include.Direction, el: Element  ) {
       let $el = el || this.$el
+
+      console.log(`disappearing: ${this.page_id}`)
         
-       if (this.active_tween){
+      if (this.active_tween){
               this.active_tween.kill()
               this.active_tween = null
       }

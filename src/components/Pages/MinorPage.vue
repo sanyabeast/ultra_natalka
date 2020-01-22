@@ -182,6 +182,6 @@ export default Vue.extend({
 
                                 .image_component 
                                         margin: 72px 0
-                                        transition: transform 0.333s ease-out
+                                        transition: transform 0.444s ease-out
 
 </style>

@@ -44,10 +44,11 @@
       />
     </div>
 
-    <div
+    <BasicComponent
       class="minor_pages_wrapper"
       ref="minor_pages_wrapper">
       <MinorPage
+        page_id="osobnyak_details"
         prime_caption_text="OSOBNYAK"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
         :appearing_animation_opacity="false"
@@ -61,6 +62,7 @@
       />
 
       <MinorPage
+        page_id="leverpresso_details"
         prime_caption_text="LEVERPRESSO"
         minor_caption_text="Landing page for Kickstarters` project. Eco-friendly espresso maker."
         :appearing_animation_opacity="false"
@@ -74,6 +76,7 @@
       />
 
       <MinorPage
+        page_id="kyivcorner_details"
         prime_caption_text="KYIVCORNER"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
         :appearing_animation_opacity="false"
@@ -85,7 +88,7 @@
           { src: 'pics/kc/kc (4).png' },
         ]"
       />
-    </div>
+    </BasicComponent>
 
     <div class="logo" @click="on_logo_click">
       <div class="content">N.P.</div>
@@ -106,9 +109,6 @@
       :appearing_animation_opacity="false"
     >
 
-      <ticker
-        text="natasha.pnsnk@gmail.com"
-      />
       <div class="content">
         <div class="head">
           <div class="text">Hello!</div>
@@ -117,6 +117,11 @@
 
         <div class="foot">
           <div class="text">contact me at</div>
+        </div>
+        <div class="email">
+          <div class="content">
+            natasha.pnsnk@gmail.com
+          </div>
         </div>
       </div>
     </Page>
@@ -132,6 +137,7 @@ import Include from "./components/Include"
 import PrimePage from "./components/Pages/PrimePage.vue"
 import Page from "./components/Page.vue"
 import MinorPage from "./components/Pages/MinorPage.vue"
+import BasicComponent from "./components/BasicComponent.vue"
 import Arrow from "./components/Arrow.vue"
 import Ticker from "./components/Ticker.vue"
 import { TweenMax, TimelineMax } from "gsap"
@@ -147,13 +153,15 @@ export default Vue.extend({
     PrimePage,
     MinorPage,
     Arrow,
-    Ticker,
-    SplashScreen
+    // Ticker,
+    SplashScreen,
+    BasicComponent
   },
 
   mounted () {
     this.setup_animations()
     let prev_time = +new Date()
+    window.app = this
    
   },
 
@@ -163,7 +171,7 @@ export default Vue.extend({
       return pages.length
     },
     total_minor_pages_count () {
-      let pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
+      let pages = this.$refs.minor_pages_wrapper.$el.querySelectorAll(".page")
       return pages.length
     }
   },
@@ -215,6 +223,11 @@ export default Vue.extend({
     active_prime_page_index ( value ) {
       let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
       let page = prime_pages[value]
+
+      if (!page){
+        return
+      }
+
       let prev_page = prime_pages[this.prev_prime_page_index]
 
 
@@ -231,38 +244,59 @@ export default Vue.extend({
       }
     },
     active_minor_page_index ( value ) {
-      let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
+      let minor_pages = this.$refs.minor_pages_wrapper.$el.querySelectorAll(".page")
       let page = minor_pages[value]
+
+      if (!page){
+        console.log(`no such page: ${value}`)
+        return
+      }
+
+      if ( value === this.prev_minor_page_index ) {
+        console.log(`prev and current are equal: ${value}`)
+      }
+
       let prev_page = minor_pages[this.prev_minor_page_index]
 
       switch ( this.last_scroll_direction ) {
         case 1:
           page.$component.scroll_to(0)
 
-          prev_page.$component.disappear_to(Include.Direction.Left)
+          if (value !== this.prev_minor_page_index){
+            prev_page.$component.disappear_to(Include.Direction.Left)
+          }
+
           page.$component.appear_from(Include.Direction.Right)
           
         break;
         case -1:
           page.$component.scroll_to(0)
-            
-          prev_page.$component.disappear_to(Include.Direction.Right)
+
+          if (value !== this.prev_minor_page_index){
+            prev_page.$component.disappear_to(Include.Direction.Right)
+          }
+          
           page.$component.appear_from(Include.Direction.Left)
         break;
       }
     },
     minor_page_shown ( new_value ) {
-      let minor_pages = this.$refs.minor_pages_wrapper.querySelectorAll(".page")
-      let active_page = minor_pages[ this.active_minor_page_index ]
-
-
+      let minor_pages = this.$refs.minor_pages_wrapper.$el.querySelectorAll(".page")
+      
+      
+        
       switch ( new_value ) {
         case true:
-            active_page.$component.appear_from(Include.Direction.Down)
+            this.$refs.minor_pages_wrapper.appear_from(Include.Direction.Down)
           break;
 
         case false:
-            active_page.$component.disappear_to(Include.Direction.Down)
+            forEach(minor_pages, ( page_el )=>{
+              page_el.$component.disappear_to(Include.Direction.Left)
+            })
+            console.log(minor_pages)
+            this.active_minor_page_index = -1
+            this.$refs.minor_pages_wrapper.disappear_to(Include.Direction.Down)
           break;
       } 
     }
@@ -294,6 +328,35 @@ export default Vue.extend({
       
       return result
 
+    },
+    on_prime_pages_wrapper_next_clicked () {
+      console.log(1)
+      let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+      let active_prime_page = prime_pages[ this.active_prime_page_index ]
+
+      if (active_prime_page.$component.is_animating){
+        return
+      }
+
+      this.last_scroll_direction = 1
+      let new_index = this.rotate_index(true, this.active_prime_page_index, this.total_prime_pages_count)
+
+      this.prev_prime_page_index = this.active_prime_page_index
+      this.active_prime_page_index = new_index
+    },
+    on_prime_pages_wrapper_prev_clicked () {
+      let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+      let active_prime_page = prime_pages[ this.active_prime_page_index ]
+
+      if (active_prime_page.$component.is_animating){
+        return
+      }
+
+      this.last_scroll_direction = -1
+      let new_index = this.rotate_index(false, this.active_prime_page_index, this.total_prime_pages_count)
+
+      this.prev_prime_page_index = this.active_prime_page_index
+      this.active_prime_page_index = new_index
     },
     on_prime_pages_wrapper_mousewheel: function( evt ){
       let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
@@ -354,8 +417,8 @@ export default Vue.extend({
 <style lang="sass">
 
   ::-webkit-scrollbar 
-    width: 2px
-    height: 2px
+    width: 4px
+    height: 4px
   
   ::-webkit-scrollbar-button 
     width: 0px
@@ -439,6 +502,21 @@ export default Vue.extend({
       justify-content: center
       visibility: hidden
 
+      .email 
+        color: #202020
+        transition: color 0.5s ease-in-out, text-shadow 0.5s ease-in-out
+        flex-shrink: 0
+        font-family: 'Montserrat', sans-serif
+        font-style: normal
+        font-weight: 900
+        font-size: 62px
+        font-variant: small-caps
+        text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
+        cursor: pointer
+        &:hover 
+          color: #47FFBD
+          text-shadow: -1px -1px 0 transparent,  1px -1px 0 transparent, -1px 1px 0 transparent,  1px 1px 0 transparent 
+
       .ticker 
         position: absolute
         left: auto
@@ -485,7 +563,6 @@ export default Vue.extend({
         top: 0
         left: 0
         opacity: 0
-        transform: translateY(100%)
 
         &.main_page 
           opacity: 1
@@ -493,7 +570,8 @@ export default Vue.extend({
 
 
     .minor_pages_wrapper 
-      width: 100%0
+      width: 100%
+      height: 100%
       display: flex
       flex-direction: row
       top: 0
@@ -501,6 +579,8 @@ export default Vue.extend({
       background: #202020
       flex-shrink: 0
       position: absolute
+      visibility: hidden
+      transform: translateY(100%)
 
       .page 
         position: absolute

@@ -83,6 +83,7 @@ export default Vue.extend({
         &.enabled 
             .ticker_content .chunk .text_wrapper p   
                 color: #47FFBD
+                text-shadow: -1px -1px 0 transparent,  1px -1px 0 transparent, -1px 1px 0 transparent,  1px 1px 0 transparent 
 
         .ticker_content 
             width: 100px
@@ -105,7 +106,7 @@ export default Vue.extend({
                     p 
                         margin: 0 0.5em
                         color: #202020
-                        transition: color 0.5s ease-in-out
+                        transition: color 0.5s ease-in-out, text-shadow 0.5s ease-in-out
                         flex-shrink: 0
                         font-family: 'Montserrat', sans-serif
                         font-style: normal
