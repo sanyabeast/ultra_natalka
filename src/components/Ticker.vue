@@ -105,13 +105,13 @@ export default Vue.extend({
 
                     p 
                         margin: 0 0.5em
-                        color: #202020
+                        color: #3a1242
                         transition: color 0.5s ease-in-out, text-shadow 0.5s ease-in-out
                         flex-shrink: 0
                         font-family: 'Montserrat', sans-serif
                         font-style: normal
                         font-weight: 900
-                        font-size: 132px
+                        font-size: 96px
                         font-variant: small-caps
                         text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
                         transform-origin: center center

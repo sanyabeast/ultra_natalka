@@ -6,7 +6,7 @@
     >
 
     <SplashScreen
-      :enabled="false"
+      :enabled="true"
       @before_disappearing="on_splashscreen_before_disappearing"
     />
 
@@ -32,6 +32,8 @@
         page_image_src="pics/lp_image.png"
         photo_caption_text="Leverpresso"
         @image_click="open_minor_page(1)"
+        initial_visibility="hidden"
+        :initial_translation="{ x: 100, y: 0 }"
       />
 
       <PrimePage
@@ -41,18 +43,22 @@
         page_image_src="pics/kc_image.png"
         photo_caption_text="Kyivcorner"
         @image_click="open_minor_page(2)"
+        initial_visibility="hidden"
+        :initial_translation="{ x: 100, y: 0 }"
       />
     </div>
 
     <BasicComponent
       class="minor_pages_wrapper"
-      ref="minor_pages_wrapper">
+      ref="minor_pages_wrapper"
+      :initial_translation="{ x: 0, y: 100 }">
       <MinorPage
         page_id="osobnyak_details"
         prime_caption_text="OSOBNYAK"
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
         :appearing_animation_opacity="false"
         @next_clicked="on_minor_page_next_clicked(0)"
+        :animations_enabled="minor_pages_animations_enabled"
         :images="[
           { src: 'pics/osobnyak/os (1).png' },
           { src: 'pics/osobnyak/os (2).png' },
@@ -67,12 +73,16 @@
         minor_caption_text="Landing page for Kickstarters` project. Eco-friendly espresso maker."
         :appearing_animation_opacity="false"
         @next_clicked="on_minor_page_next_clicked(1)"
+        :animations_enabled="minor_pages_animations_enabled"
         :images="[
           { src: 'pics/lp/lp (1).jpg' },
           { src: 'pics/lp/lp (2).jpg' },
           { src: 'pics/lp/lp (3).jpg' },
           { src: 'pics/lp/lp (4).jpg' },
         ]"
+
+        initial_visibility="hidden"
+        :initial_translation="{ x: 100, y: 0 }"
       />
 
       <MinorPage
@@ -81,12 +91,16 @@
         minor_caption_text="The house of Ukrainian brands. Shopping center with friendly-services."
         :appearing_animation_opacity="false"
         @next_clicked="on_minor_page_next_clicked(2)"
+        :animations_enabled="minor_pages_animations_enabled"
         :images="[
           { src: 'pics/kc/kc (1).png' },
           { src: 'pics/kc/kc (2).png' },
           { src: 'pics/kc/kc (3).png' },
           { src: 'pics/kc/kc (4).png' },
         ]"
+
+        initial_visibility="hidden"
+        :initial_translation="{ x: 100, y: 0 }"
       />
     </BasicComponent>
 
@@ -95,7 +109,7 @@
     </div>
 
     <Arrow
-      :enabled="minor_page_shown"
+      :enabled="minor_pages_shown"
       @click="on_minor_page_prev_clicked"
     />
 
@@ -107,6 +121,7 @@
       class="about_page"
       ref="about_page"
       :appearing_animation_opacity="false"
+      initial_visibility="hidden"
     >
 
       <div class="content">
@@ -199,7 +214,8 @@ export default Vue.extend({
       scroll_tween_easing: "Power3.easeInOut",
       minor_page_animation_duration: 0.555,
       minor_page_animation_easing: "Power3.easeInOut",
-      minor_page_shown: false,
+      minor_pages_shown: false,
+      minor_pages_animations_enabled: false,
       scroll_tween_a: null,
       scroll_tween_b: null,
       appearing_animation,
@@ -280,23 +296,23 @@ export default Vue.extend({
         break;
       }
     },
-    minor_page_shown ( new_value ) {
+    minor_pages_shown ( new_value ) {
       let minor_pages = this.$refs.minor_pages_wrapper.$el.querySelectorAll(".page")
-      
-      
-        
+              
       switch ( new_value ) {
         case true:
             this.$refs.minor_pages_wrapper.appear_from(Include.Direction.Down)
           break;
 
         case false:
-            forEach(minor_pages, ( page_el )=>{
-              page_el.$component.disappear_to(Include.Direction.Left)
-            })
-            console.log(minor_pages)
+            
             this.active_minor_page_index = -1
-            this.$refs.minor_pages_wrapper.disappear_to(Include.Direction.Down)
+            
+            this.$refs.minor_pages_wrapper.disappear_to(Include.Direction.Down, true, ()=>{
+              forEach(minor_pages, ( page_el )=>{
+                page_el.$component.disappear_to(Include.Direction.Left, false )
+              })
+            })
           break;
       } 
     }
@@ -384,15 +400,18 @@ export default Vue.extend({
     },
     on_logo_click () {
       this.about_page_visible = false
-      this.minor_page_shown = false
+      this.minor_pages_animations_enabled = false
+      this.minor_pages_shown = false
     },
     on_about_me_click () {
-      this.minor_page_shown = false
+      this.minor_pages_animations_enabled = false
+      this.minor_pages_shown = false
       this.about_page_visible = true
     },
     open_minor_page (page_index: String){
       this.active_minor_page_index = page_index
-      this.minor_page_shown = true
+      this.minor_pages_shown = true
+      this.minor_pages_animations_enabled = true
     },
     on_minor_page_next_clicked ( page_index: Number ){
       let new_index = this.rotate_index(true, page_index, 3)
@@ -436,8 +455,8 @@ export default Vue.extend({
     background: #47ffbd
   
   ::-webkit-scrollbar-track 
-    background: #202020
-    border: 0px none #202020
+    background: #3a1242
+    border: 0px none #3a1242
     border-radius: 50px
   
   ::-webkit-scrollbar-track:hover 
@@ -458,7 +477,7 @@ export default Vue.extend({
     overflow: hidden!important
 
   .app-root 
-    background: #202020
+    background: #3a1242
     width: 100%
     height: 100%
     display: flex
@@ -495,7 +514,7 @@ export default Vue.extend({
       left: 0
       width: 100vw
       height: 100vh
-      background: #202020
+      background: #3a1242
       display: flex
       flex-direction: column
       align-items: center
@@ -503,7 +522,7 @@ export default Vue.extend({
       visibility: hidden
 
       .email 
-        color: #202020
+        color: #3a1242
         transition: color 0.5s ease-in-out, text-shadow 0.5s ease-in-out
         flex-shrink: 0
         font-family: 'Montserrat', sans-serif
@@ -576,7 +595,7 @@ export default Vue.extend({
       flex-direction: row
       top: 0
       left: 0
-      background: #202020
+      background: #3a1242
       flex-shrink: 0
       position: absolute
       visibility: hidden
@@ -590,7 +609,7 @@ export default Vue.extend({
         position: absolute
         top: 0
         left: 0
-        background: #202020
+        background: #3a1242
         visibility: hidden
         
 

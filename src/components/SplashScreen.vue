@@ -106,7 +106,7 @@ export default Vue.extend({
         width: 100%
         height: 100%
         z-index: 3
-        background-color: #202020
+        background-color: #3a1242
         display: flex
         flex-direction: column
         justify-content: center

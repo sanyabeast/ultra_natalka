@@ -49,8 +49,24 @@ export default Vue.extend({
   },
   mounted () {
     this.$el.$component = this
+    this.$el.style.visibility = this.initial_visibility
+    this.$el.style.transform = `translate(${this.initial_translation.x}%, ${this.initial_translation.y}%)`
   },
   props: {
+    initial_visibility: {
+      type: String,
+      default: ()=> "visible"
+    },
+    animations_enabled: {
+      type: Boolean,
+      default: ()=> true
+    },
+    initial_translation: {
+      type: Object,
+      default: ()=> {
+        return { x: 0, y: 0 }
+      }
+    },
     appearing_animation_opacity: {
       type: Boolean,
       default: ()=> true
@@ -93,11 +109,11 @@ export default Vue.extend({
     scroll_to ( scroll_pos ) {
 
     },
-    appear_from ( dir: Include.Direction, el: Element ) {
+    appear_from ( dir: Include.Direction, animation_enabled: Boolean = true, on_complete: Function = function(){} ) {
 
       console.log(`appearing: ${this.page_id}`)
 
-      let $el = el || this.$el
+      let $el = this.$el
 
       if (this.active_tween){
               this.active_tween.kill()
@@ -106,7 +122,7 @@ export default Vue.extend({
 
       switch ( dir ) {
         case Include.Direction.Up:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 0,
             y: -100,
             x:0,
@@ -115,14 +131,14 @@ export default Vue.extend({
             y: 0,
             x:0,
             onStart: ()=> { this.is_animating = true; this.$el.style.visibility="visible"; },
-            onComplete: ()=> {this.is_animating = false; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
         break;
 
         case Include.Direction.Down:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 0,
             y: 100,
             x:0
@@ -131,35 +147,35 @@ export default Vue.extend({
             y: 0,
             x:0,
             onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"; },
-            onComplete: ()=> {this.is_animating = false; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
         break;
 
         case Include.Direction.Left:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 0,
             x: -100
           }, {
             opacity: 1,
             x: 0,
             onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"; },
-            onComplete: ()=> {this.is_animating = false; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
         break;
 
         case Include.Direction.Right:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 0,
             x: 100
           }, {
             opacity: 1,
             x: 0,
             onStart: ()=> {this.is_animating = true; this.$el.style.visibility="visible"; },
-            onComplete: ()=> {this.is_animating = false; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
@@ -167,10 +183,8 @@ export default Vue.extend({
       }
 
     },
-    disappear_to ( dir: Include.Direction, el: Element  ) {
-      let $el = el || this.$el
-
-      console.log(`disappearing: ${this.page_id}`)
+    disappear_to ( dir: Include.Direction, animation_enabled = true, on_complete = function(){} ) {
+      let $el = this.$el
         
       if (this.active_tween){
               this.active_tween.kill()
@@ -179,7 +193,7 @@ export default Vue.extend({
 
       switch ( dir ) {
         case Include.Direction.Up:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 1,
             y: 0,
             x:0,
@@ -188,14 +202,14 @@ export default Vue.extend({
             y: -100,
             x:0,
             onStart: ()=> {this.is_animating = true},
-            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
         break;
 
         case Include.Direction.Down:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 1,
             y: 0,
             x: 0,
@@ -204,35 +218,36 @@ export default Vue.extend({
             y: 100,
             x:0,
             onStart: ()=> {this.is_animating = true},
-            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
         break;
 
         case Include.Direction.Left:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          console.log((this.animations_enabled && animation_enabled))
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 1,
             x: 0
           }, {
             opacity: 0,
             x: -100,
             onStart: ()=> {this.is_animating = true},
-            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
         break;
 
         case Include.Direction.Right:
-          this.active_tween = TweenMax.fromTo( this.current_transform, this.appearing_animation_duration, {
+          this.active_tween = TweenMax.fromTo( this.current_transform, (this.animations_enabled && animation_enabled) ? this.appearing_animation_duration : 0, {
             opacity: 1,
             x: 0
           }, {
             opacity: 0,
             x: 100,
             onStart: ()=> {this.is_animating = true},
-            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null},
+            onComplete: ()=> {this.is_animating = false; this.$el.style.visibility="hidden"; this.active_tween = null; on_complete(); },
             onUpdate: ()=> this.update_styles(),
             ease: this.appearing_animation_ease
           } )
