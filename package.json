@@ -36,7 +36,8 @@
     "lodash-es": "latest",
     "gsap": "latest",
     "lerp": "latest",
-    "hammerjs": "latest"
+    "hammerjs": "latest",
+    "device.js": "latest"
   },
   "eslintConfig": {
     "root": true,

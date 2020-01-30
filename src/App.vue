@@ -2,6 +2,7 @@
   <div 
       class="app-root"
       ref="root"
+      :data-desktop="is_desktop"
       @mousemove="on_mousemove"
     >
 
@@ -13,7 +14,7 @@
     <div
         class="prime_pages_wrapper"
         ref="prime_pages_wrapper"
-        v-on:mousewheel.prevent="on_prime_pages_wrapper_mousewheel"
+        v-on:mousewheel="on_prime_pages_wrapper_mousewheel"
       >
       <PrimePage
         page_id="osobnyak"
@@ -147,6 +148,8 @@
 
 
 <script lang="ts">
+
+import Device from "device.js"
 import Vue from 'vue';
 import Include from "./components/Include"
 import PrimePage from "./components/Pages/PrimePage.vue"
@@ -159,6 +162,10 @@ import { TweenMax, TimelineMax } from "gsap"
 import { throttle, forEach } from "lodash-es"
 
 import SplashScreen from "./components/SplashScreen.vue"
+
+let device = new Device()
+
+console.log(device)
 
 export default Vue.extend({
   name: 'App',
@@ -181,6 +188,9 @@ export default Vue.extend({
   },
 
   computed: {
+    is_desktop () {
+      return device.desktop ? 1 : 0
+    },
     total_prime_pages_count () {
       let pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
       return pages.length
@@ -307,7 +317,7 @@ export default Vue.extend({
         case false:
             
             this.active_minor_page_index = -1
-            
+
             this.$refs.minor_pages_wrapper.disappear_to(Include.Direction.Down, true, ()=>{
               forEach(minor_pages, ( page_el )=>{
                 page_el.$component.disappear_to(Include.Direction.Left, false )
@@ -375,18 +385,22 @@ export default Vue.extend({
       this.active_prime_page_index = new_index
     },
     on_prime_pages_wrapper_mousewheel: function( evt ){
-      let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
-      let active_prime_page = prime_pages[ this.active_prime_page_index ]
+      if ( this.is_desktop ) {
+        evt.preventDefault()
+        let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+        let active_prime_page = prime_pages[ this.active_prime_page_index ]
 
-      if (active_prime_page.$component.is_animating){
-        return
+        if (active_prime_page.$component.is_animating){
+          return
+        }
+
+        this.last_scroll_direction = evt.deltaY > 0 ? 1 : -1
+        let new_index = this.rotate_index(evt.deltaY > 0, this.active_prime_page_index, this.total_prime_pages_count)
+
+        this.prev_prime_page_index = this.active_prime_page_index
+        this.active_prime_page_index = new_index
       }
-
-      this.last_scroll_direction = evt.deltaY > 0 ? 1 : -1
-      let new_index = this.rotate_index(evt.deltaY > 0, this.active_prime_page_index, this.total_prime_pages_count)
-
-      this.prev_prime_page_index = this.active_prime_page_index
-      this.active_prime_page_index = new_index
+      
     },
     setup_animations () {
       this.appearing_animation.fromTo(this.$refs.prime_pages_wrapper, 1, {
@@ -611,6 +625,60 @@ export default Vue.extend({
         left: 0
         background: #3a1242
         visibility: hidden
+
+  .app-root[data-desktop="0"]
+    .prime_pages_wrapper
+      height: auto
+      overflow-y: auto
+      display: flex
+      flex-direction: column
+
+      .prime-page 
+        position: relative
+        transform: none!important
+        opacity: 1!important
+        visibility: visible!important
+
+        .content 
+          display: flex
+          align-items: center
+          justify-content: center
+          padding: 20px
+
+          .image_component
+            width: calc(100vw - 40px)
+            height: calc(100vw - 40px)
+            transform: none!important
+            img
+              height: 100%
+              width: auto
+
+
+          .foot
+            align-self: flex-start
+
+
+        .ticker
+          display: none
+    .about
+      bottom: auto
+      left: auto
+      top: 20px
+      right: 20px
+      .content
+        color: #47FFA7
+
+    .logo 
+      bottom: auto
+      left: 20px
+      top: 20px
+      right: auto
+      .content
+        color: #47FFA7
+
+    .arrow_button
+      display: none!important
+    
         
 
 </style>
