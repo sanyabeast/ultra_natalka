@@ -178,10 +178,18 @@ export default Vue.extend({
                                 display: flex
                                 flex-direction: column
                                 flex-shrink: 0
+                                align-items: center
+                                width: 50vw
 
 
                                 .image_component 
                                         margin: 72px 0
                                         transition: transform 0.444s ease-out
+                                        width: 100%
+                                        
+                                       
+                                        img 
+                                                width: 100%
+                                                height: auto
 
 </style>
