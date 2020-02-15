@@ -3,6 +3,7 @@
         class="page minor_page"
     >
         <Ticker 
+                v-if="$store.getters.is_desktop"
                 :text="ticker_text"
                 @click="$emit('next_clicked')"
         />
@@ -28,6 +29,12 @@
                                         }"
                                         :image_src="item.src"
                                 />
+                                <Ticker 
+                                        v-if="!$store.getters.is_desktop"
+                                        :text="ticker_text"
+                                        @click="$emit('next_clicked')"
+                                />
+
                         </div>
                 </div>
         </div>
@@ -118,7 +125,7 @@ export default Vue.extend({
 
 
 <style lang="sass">
-    .minor_page 
+.minor_page 
         width: 100vw
         min-height: 100%
         display: flex
@@ -162,7 +169,7 @@ export default Vue.extend({
                                         font-weight: 900
                                         font-size: 96px
                                         font-variant: small-caps
-                                        color: #FFFFFF
+                                        color: #47FFA7
                                         mix-blend-mode: normal
                                         box-sizing: border-box
 
@@ -172,7 +179,7 @@ export default Vue.extend({
                                         font-weight: normal
                                         font-size: 18px
                                         line-height: 28px
-                                        color: #FFFFFF
+                                        color: #47FFA7
 
                         .images 
                                 display: flex
@@ -191,5 +198,35 @@ export default Vue.extend({
                                         img 
                                                 width: 100%
                                                 height: auto
+
+
+.app-root[data-desktop="0"]  
+        .minor_page
+                .page_content
+                        .content
+                                padding: 20px
+                                padding-bottom: 40px
+                                .captions
+                                        margin-bottom: 90px
+                                        width: 100%
+                                        .prime_caption
+                                                font-size: 40px
+
+                                .images 
+                                        width: 100%
+                                        .image_component
+                                                margin: 36px 0
+
+
+                                .ticker
+                                        position: relative
+                                        top: 0
+                                        left: 0
+                                        right: 0
+                                        width: 100vh
+                                        transform: translateX(0%)
+                                        transform-origin: top left
+                                        cursor: pointer
+                                                        
 
 </style>

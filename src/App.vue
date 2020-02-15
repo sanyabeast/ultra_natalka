@@ -2,12 +2,12 @@
   <div 
       class="app-root"
       ref="root"
-      :data-desktop="is_desktop"
+      :data-desktop="$store.getters.is_desktop"
       @mousemove="on_mousemove"
     >
 
     <SplashScreen
-      :enabled="true"
+      :enabled="false"
       @before_disappearing="on_splashscreen_before_disappearing"
     />
 
@@ -15,6 +15,7 @@
         class="prime_pages_wrapper"
         ref="prime_pages_wrapper"
         v-on:mousewheel="on_prime_pages_wrapper_mousewheel"
+        v-on:scroll="on_prime_pages_scroll"
       >
       <PrimePage
         page_id="osobnyak"
@@ -149,7 +150,6 @@
 
 <script lang="ts">
 
-import Device from "device.js"
 import Vue from 'vue';
 import Include from "./components/Include"
 import PrimePage from "./components/Pages/PrimePage.vue"
@@ -159,13 +159,10 @@ import BasicComponent from "./components/BasicComponent.vue"
 import Arrow from "./components/Arrow.vue"
 import Ticker from "./components/Ticker.vue"
 import { TweenMax, TimelineMax } from "gsap"
-import { throttle, forEach } from "lodash-es"
+import { debounce, forEach } from "lodash-es"
 
 import SplashScreen from "./components/SplashScreen.vue"
 
-let device = new Device()
-
-console.log(device)
 
 export default Vue.extend({
   name: 'App',
@@ -188,9 +185,6 @@ export default Vue.extend({
   },
 
   computed: {
-    is_desktop () {
-      return device.desktop ? 1 : 0
-    },
     total_prime_pages_count () {
       let pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
       return pages.length
@@ -385,7 +379,7 @@ export default Vue.extend({
       this.active_prime_page_index = new_index
     },
     on_prime_pages_wrapper_mousewheel: function( evt ){
-      if ( this.is_desktop ) {
+      if ( this.$store.getters.is_desktop ) {
         evt.preventDefault()
         let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
         let active_prime_page = prime_pages[ this.active_prime_page_index ]
@@ -402,6 +396,24 @@ export default Vue.extend({
       }
       
     },
+    on_prime_pages_scroll: function ( evt ) {
+      if ( !this.$store.getters.is_desktop ) {
+        this.on_prime_pages_scroll_debounced( evt )
+      }
+    }, 
+    on_prime_pages_scroll_debounced: debounce(function( evt ){
+      let pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
+      let scroll_position = this.$refs.prime_pages_wrapper.scrollTop
+      
+      let page_index = Math.round( scroll_position / window.innerHeight )
+
+      TweenMax.to( this.$refs.prime_pages_wrapper, 0.333, {
+        scrollTop: page_index * window.innerHeight,
+        ease: "Power2.easeIn"
+      } )
+
+      console.log(page_index )
+    }, 100),  
     setup_animations () {
       this.appearing_animation.fromTo(this.$refs.prime_pages_wrapper, 1, {
         yPercent: 0
@@ -516,7 +528,7 @@ export default Vue.extend({
         font-size: 18px
         line-height: 22px
         text-transform: uppercase
-        color: #ffffff
+        color: #47FFA7
 
     .about 
       bottom: 48px
@@ -578,7 +590,7 @@ export default Vue.extend({
           font-style: normal
           font-weight: normal
           font-size: 18px
-          color: #FFFFFF
+          color: #47FFA7
 
     .prime_pages_wrapper
       flex-shrink: 0
@@ -627,6 +639,19 @@ export default Vue.extend({
         visibility: hidden
 
   .app-root[data-desktop="0"]
+
+    .about_page 
+      .content 
+        width: 100%
+        padding: 20px
+        .head
+          margin-bottom: 40px
+        .email  
+          .content
+            padding: 0
+            font-size: 24px
+
+
     .prime_pages_wrapper
       height: auto
       overflow-y: auto

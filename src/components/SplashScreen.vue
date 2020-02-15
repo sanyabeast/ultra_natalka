@@ -61,22 +61,45 @@ export default Vue.extend({
                 
         },
         setup_appearing_animation () {
-                this.animation_timeline.fromTo( this.$refs.large_caption, 1, {
-                        y: -100,
-                        opacity: 0
-                }, {
-                        y: 0,
-                        opacity: 1
-                } )
 
-                this.animation_timeline.fromTo( this.$refs.small_caption, 1, {
-                        y: -100,
-                        opacity: 0
-                }, {
-                        delay: 0.5,
-                        y: 0,
-                        opacity: 1
-                } )
+                if ( this.$store.getters.is_desktop ) {
+                         this.animation_timeline.fromTo( this.$refs.large_caption, 1, {
+                                y: -100,
+                                opacity: 0
+                        }, {
+                                y: 0,
+                                opacity: 1
+                        } )
+
+                        this.animation_timeline.fromTo( this.$refs.small_caption, 1, {
+                                y: -100,
+                                opacity: 0
+                        }, {
+                                delay: 0.5,
+                                y: 0,
+                                opacity: 1
+                        } )
+                } else {
+                         this.animation_timeline.fromTo( this.$refs.large_caption, 1, {
+                                y: -100,
+                                opacity: 0
+                        }, {
+                                y: 0,
+                                opacity: 1
+                        } )
+
+                        this.animation_timeline.fromTo( this.$refs.small_caption, 1, {
+                                y: 100,
+                                opacity: 0
+                        }, {
+                                delay: 0.5,
+                                y: 0,
+                                opacity: 1
+                        } )
+                }
+                
+
+               
 
                 this.animation_timeline.fromTo( this.$refs.root, 1, {
                         yPercent: 0,
@@ -145,5 +168,29 @@ export default Vue.extend({
                                 background-position: center center
                                 border-color: transparent
                                 border-style: solid
+
+.app-root[data-desktop="0"] 
+        .splash-screen
+                .content
+
+                        flex-direction: column
+
+                        
+                        .large_caption
+                                width: 100%
+                                div
+                                        
+                                        font-size: 40px
+
+
+                        .small_caption
+                                width: 100%
+                                margin-top: 1.5em
+                                div
+
+                                        font-size: 32px
+                                        
+
+
 
 </style>

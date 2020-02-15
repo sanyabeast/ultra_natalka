@@ -164,7 +164,7 @@ export default Vue.extend({
                                 font-size: 18px
                                 line-height: 22px
                                 text-transform: capitalize
-                                color: #FFFFFF
+                                color: #47FFA7
                                 transform: translateY(-4px)
 
 </style>

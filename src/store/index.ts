@@ -2,8 +2,11 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { WebGLRenderer } from "three"
 import { forEach } from "lodash-es"
+import Device from "device.js"
 
 Vue.use(Vuex)
+
+let device = new Device()
 
 class GameLoop {
   prev_frame_date: Number
@@ -71,6 +74,9 @@ export default new Vuex.Store({
     },
     normalized_mouse_pos_y ( store ) {
       return store.mouse_position_y / window.innerHeight
+    },
+    is_desktop () {
+      return device.desktop ? 1 : 0
     }
   },
   mutations: {
