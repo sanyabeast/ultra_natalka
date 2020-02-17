@@ -8,6 +8,7 @@
                         <div class="item_a"></div>
                         <div class="item_b"></div>
                 </div>
+                <div class="arrow_caption" v-html="arrow_caption"></div>
                 <div class="hitbox"></div>
         </div>
 </template>
@@ -20,6 +21,10 @@ export default Vue.extend({
                 enabled: {
                         type: Boolean,
                         default: ()=> true
+                },
+                arrow_caption: {
+                        type: String,
+                        default: "Back"
                 }
         }
 })
@@ -49,6 +54,22 @@ export default Vue.extend({
                         position: absolute
                         left: 0
                         top: 0
+
+                .arrow_caption
+                        position: absolute
+                        opacity: 0
+                        z-index: -1
+                        font-family: Montserrat
+                        font-style: normal
+                        font-weight: 800
+                        font-size: 18px
+                        line-height: 22px
+                        letter-spacing: 0.02em
+                        color: #47FFA7
+                        right: -32px
+                        transform: translate(200%, -50%)
+                        text-transform: capitalize
+                        transition: opacity 0.15s ease-in-out
 
                 .arrow
                         position: absolute
@@ -81,5 +102,8 @@ export default Vue.extend({
 
                                 .item_b 
                                         transform: rotate(-45deg)
+
+                        .arrow_caption
+                                opacity: 1
         
 </style>

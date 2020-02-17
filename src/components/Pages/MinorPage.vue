@@ -162,6 +162,7 @@ export default Vue.extend({
                                 align-items: flex-start
                                 flex-shrink: 0
                                 margin-top: 20vh
+                                width: 50vw
 
                                 .prime_caption
                                         font-family: 'Montserrat', sans-serif
@@ -205,7 +206,7 @@ export default Vue.extend({
                 .page_content
                         .content
                                 padding: 20px
-                                padding-bottom: 40px
+                                margin-bottom: 80px
                                 .captions
                                         margin-bottom: 90px
                                         width: 100%

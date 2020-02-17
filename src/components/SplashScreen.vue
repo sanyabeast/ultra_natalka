@@ -61,57 +61,78 @@ export default Vue.extend({
                 
         },
         setup_appearing_animation () {
+                let large_caption_props = { y: -100, opacity: 0 }
+                let small_caption_props =  { y: -100, opacity: 0 }
 
                 if ( this.$store.getters.is_desktop ) {
-                         this.animation_timeline.fromTo( this.$refs.large_caption, 1, {
+                         this.animation_timeline.fromTo(large_caption_props, 1, {
                                 y: -100,
                                 opacity: 0
                         }, {
                                 y: 0,
-                                opacity: 1
+                                opacity: 1,
+                                onUpdate: (t)=> {
+                                        this.$refs.large_caption.style.transform = `translateY(${large_caption_props.y}%)`
+                                        this.$refs.large_caption.style.opacity = large_caption_props.opacity
+                                }
                         } )
 
-                        this.animation_timeline.fromTo( this.$refs.small_caption, 1, {
+                        this.animation_timeline.fromTo( small_caption_props, 1, {
                                 y: -100,
                                 opacity: 0
                         }, {
                                 delay: 0.5,
                                 y: 0,
-                                opacity: 1
+                                opacity: 1,
+                                onUpdate: ()=>{
+                                        this.$refs.small_caption.style.transform = `translateY(${small_caption_props.y}%)`
+                                        this.$refs.small_caption.style.opacity = small_caption_props.opacity   
+                                }
                         } )
                 } else {
-                         this.animation_timeline.fromTo( this.$refs.large_caption, 1, {
+                         this.animation_timeline.fromTo( large_caption_props, 1, {
                                 y: -100,
                                 opacity: 0
                         }, {
                                 y: 0,
-                                opacity: 1
+                                opacity: 1,
+                                onUpdate: (t)=> {
+                                        this.$refs.large_caption.style.transform = `translateY(${large_caption_props.y}%)`
+                                        this.$refs.large_caption.style.opacity = large_caption_props.opacity
+                                }
                         } )
 
-                        this.animation_timeline.fromTo( this.$refs.small_caption, 1, {
+                        this.animation_timeline.fromTo( small_caption_props, 1, {
                                 y: 100,
                                 opacity: 0
                         }, {
                                 delay: 0.5,
                                 y: 0,
-                                opacity: 1
+                                opacity: 1,
+                                onUpdate: ()=>{
+                                        this.$refs.small_caption.style.transform = `translateY(${small_caption_props.y}%)`
+                                        this.$refs.small_caption.style.opacity = small_caption_props.opacity   
+                                }
                         } )
                 }
                 
 
                
-
-                this.animation_timeline.fromTo( this.$refs.root, 1, {
-                        yPercent: 0,
+                let root_props = { y: 0 }
+                this.animation_timeline.fromTo( root_props, 1, {
+                        y: 0,
                 }, {
                         delay: 1,
-                        yPercent: 100,
+                        y: 100,
                         onStart: ()=>{
                                 this.$emit("before_disappearing")
                         },
                         onComplete: ()=>{
                                 this.$emit("disappeared")
                                 this.visible = false
+                        },
+                        onUpdate: ()=>{
+                                this.$refs.root.style.transform = `translateY(${root_props.y}%)`
                         }
                 } )
         }
@@ -133,6 +154,7 @@ export default Vue.extend({
         display: flex
         flex-direction: column
         justify-content: center
+        align-items: center
         padding: 32px
 
         .content
@@ -141,6 +163,7 @@ export default Vue.extend({
                 flex-direction: row
                 justify-content: space-between
                 align-items: flex-end
+                max-width: 1280px
                 
                 .large_caption
                         display: flex
@@ -171,6 +194,7 @@ export default Vue.extend({
 
 .app-root[data-desktop="0"] 
         .splash-screen
+                
                 .content
 
                         flex-direction: column

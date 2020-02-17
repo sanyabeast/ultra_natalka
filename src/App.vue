@@ -7,7 +7,7 @@
     >
 
     <SplashScreen
-      :enabled="false"
+      :enabled="true"
       @before_disappearing="on_splashscreen_before_disappearing"
     />
 
@@ -15,7 +15,9 @@
         class="prime_pages_wrapper"
         ref="prime_pages_wrapper"
         v-on:mousewheel="on_prime_pages_wrapper_mousewheel"
-        v-on:scroll="on_prime_pages_scroll"
+        v-on:touchmove="on_prime_pages_scroll"
+        v-on:touchstart="prime_pages_touch_captured = true"
+        v-on:touchend="prime_pages_touch_captured = false; on_prime_pages_scroll()"
       >
       <PrimePage
         page_id="osobnyak"
@@ -113,6 +115,7 @@
     <Arrow
       :enabled="minor_pages_shown"
       @click="on_minor_page_prev_clicked"
+      arrow_caption="back"
     />
 
     <div class="about" @click="on_about_me_click">
@@ -128,8 +131,12 @@
 
       <div class="content">
         <div class="head">
-          <div class="text">Hello!</div>
-          <div class="text">My name is Natalya Panasenko. I am web designer from Kyiv.</div>
+          <div class="texts">
+            <div class="text">Hello!</div>
+            <div class="text">My name is Natalya Panasenko. I am web designer from <span>Kyiv</span>.</div>
+            <div class="text">Some UI, some UX, some JS included.</div>
+          </div>
+          <img src="pics/kyiv.png"/>
         </div>
 
         <div class="foot">
@@ -206,6 +213,7 @@ export default Vue.extend({
     minor_page_disappearing_animation.pause()
 
     return {
+      prime_pages_touch_captured: false,
       prev_mousemove_time: +new Date(),
       mousemove_min_delay: 1000 / 10,
       about_page_visible: false,
@@ -350,7 +358,6 @@ export default Vue.extend({
 
     },
     on_prime_pages_wrapper_next_clicked () {
-      console.log(1)
       let prime_pages = this.$refs.prime_pages_wrapper.querySelectorAll(".page")
       let active_prime_page = prime_pages[ this.active_prime_page_index ]
 
@@ -398,7 +405,17 @@ export default Vue.extend({
     },
     on_prime_pages_scroll: function ( evt ) {
       if ( !this.$store.getters.is_desktop ) {
-        this.on_prime_pages_scroll_debounced( evt )
+        
+        if (this.auto_scroll_tween){
+          this.auto_scroll_tween.kill()
+          this.auto_scroll_tween = null
+        }
+
+        if (!this.prime_pages_touch_captured){
+
+          this.on_prime_pages_scroll_debounced( evt )
+        }
+        
       }
     }, 
     on_prime_pages_scroll_debounced: debounce(function( evt ){
@@ -407,13 +424,14 @@ export default Vue.extend({
       
       let page_index = Math.round( scroll_position / window.innerHeight )
 
-      TweenMax.to( this.$refs.prime_pages_wrapper, 0.333, {
+      this.auto_scroll_tween = TweenMax.to( this.$refs.prime_pages_wrapper, 0.333, {
         scrollTop: page_index * window.innerHeight,
-        ease: "Power2.easeIn"
+        ease: "Power4.easeInOut",
+        onComplete: ()=>{
+          this.auto_scroll_tween = null
+        }
       } )
-
-      console.log(page_index )
-    }, 100),  
+    }, 1000),  
     setup_animations () {
       this.appearing_animation.fromTo(this.$refs.prime_pages_wrapper, 1, {
         yPercent: 0
@@ -428,16 +446,34 @@ export default Vue.extend({
       this.about_page_visible = false
       this.minor_pages_animations_enabled = false
       this.minor_pages_shown = false
+
+      this.$store.dispatch( "analyticsEvent", {
+				cat: "main_page",
+				action: "logo_clicked",
+				label: `logo_clicked`
+			} )
     },
     on_about_me_click () {
       this.minor_pages_animations_enabled = false
       this.minor_pages_shown = false
       this.about_page_visible = true
+
+      this.$store.dispatch( "analyticsEvent", {
+				cat: "about_page",
+				action: "opened",
+				label: `opened`
+			} )
     },
     open_minor_page (page_index: String){
       this.active_minor_page_index = page_index
       this.minor_pages_shown = true
       this.minor_pages_animations_enabled = true
+
+      this.$store.dispatch( "analyticsEvent", {
+				cat: "project_page",
+				action: "opened",
+				label: `project_${this.active_minor_page_index}`
+			} )
     },
     on_minor_page_next_clicked ( page_index: Number ){
       let new_index = this.rotate_index(true, page_index, 3)
@@ -445,7 +481,14 @@ export default Vue.extend({
       this.prev_minor_page_index = page_index
       this.last_scroll_direction = 1
       this.active_minor_page_index = new_index
-    },
+
+      this.$store.dispatch( "analyticsEvent", {
+				cat: "project_page",
+				action: "next_button_clicked",
+				label: `project_${this.active_minor_page_index}`
+			} )
+
+    },  
     on_minor_page_prev_clicked (){
       let page_index = this.active_minor_page_index
       let new_index = this.rotate_index(false, page_index, 3)
@@ -453,6 +496,12 @@ export default Vue.extend({
       this.prev_minor_page_index = page_index
       this.last_scroll_direction = -1
       this.active_minor_page_index = new_index
+
+      this.$store.dispatch( "analyticsEvent", {
+				cat: "project_page",
+				action: "button_button_clicked",
+				label: `project_${this.active_minor_page_index}`
+			} )
     }
   }
 });
@@ -533,6 +582,8 @@ export default Vue.extend({
     .about 
       bottom: 48px
       top: auto
+      .content  
+        text-transform: capitalize
 
     .about_page
       position: absolute
@@ -584,6 +635,16 @@ export default Vue.extend({
 
         .head 
           margin-bottom: 92px
+          display: flex
+          flex-direction: row
+          align-items: flex-end
+
+          .texts
+            display: flex
+            flex-direction: column
+
+          img 
+            margin-left: 96px
 
         .text
           font-family: 'Montserrat', sans-serif
@@ -591,6 +652,13 @@ export default Vue.extend({
           font-weight: normal
           font-size: 18px
           color: #47FFA7
+          line-height: 28px
+
+          span 
+            color: #fff
+
+          
+          
 
     .prime_pages_wrapper
       flex-shrink: 0
@@ -646,6 +714,13 @@ export default Vue.extend({
         padding: 20px
         .head
           margin-bottom: 40px
+          flex-direction: column-reverse
+          align-items: flex-start
+
+          img 
+            margin-left: 0
+            margin-bottom: 48px
+
         .email  
           .content
             padding: 0

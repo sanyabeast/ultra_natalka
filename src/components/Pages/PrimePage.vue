@@ -103,7 +103,8 @@ export default Vue.extend({
 
 
 <style lang="sass">
-    .prime-page 
+
+.prime-page 
         width: 100vw
         min-height: 100%
         display: flex
@@ -153,18 +154,30 @@ export default Vue.extend({
                         flex-direction: row
                         align-items: flex-end
                         margin-top: 32px
+                        justify-content: space-between
 
                         .list_position_indicator 
                                 margin-right: 24px
 
                         .photo_caption
                                 font-family: 'Montserrat', sans-serif
-                                font-style: normal
-                                font-weight: normal
-                                font-size: 18px
-                                line-height: 22px
-                                text-transform: capitalize
-                                color: #47FFA7
-                                transform: translateY(-4px)
+                                font-weight: 800
+                                font-size: 36px
+                                line-height: 44px
+                                letter-spacing: 0.08em
+                                text-transform: uppercase
+                                color: #47FFBD 
+.app-root[data-desktop="0"] 
+        .prime-page
+                .content        
+                        .foot 
+                                .photo_caption
+                                        font-family: 'Montserrat', sans-serif
+                                        font-style: normal
+                                        font-weight: normal
+                                        font-size: 18px
+                                        line-height: 22px
+                                        text-transform: capitalize
+                                        transform: translateY(-4px)
 
 </style>

@@ -66,7 +66,9 @@ export default new Vuex.Store({
     // gl_renderer: gl_renderer,
     mouse_position_x: 0,
     mouse_position_y: 0,
-    game_loop: new GameLoop().run()
+    game_loop: new GameLoop().run(),
+    analyticsTracker: null,
+    disableAnalytics: false
   },
   getters: {
     normalized_mouse_pos_x ( store ) {
@@ -82,6 +84,27 @@ export default new Vuex.Store({
   mutations: {
   },
   actions: {
+    analyticsEvent ( store, { cat, action, label, value } ) {
+
+      if ( store.state.disableAnalytics ) {
+        console.log( `Analytics disabled. Event: ${ cat|| "" }/${ action|| "" }/${ label || "" }/${ value || "" }` )
+        return
+      }
+  
+      let tracker = store.state.analyticsTracker
+  
+      try {
+  
+        if ( !tracker ) {
+          tracker = ga.getAll()[0];
+          store.commit( "analyticsTracker", tracker )
+        }
+  
+        tracker.send( "event", cat, action, label, value );
+      } catch ( err ) {
+        console.warn( err )
+      }
+    }
   },
   modules: {
   }
