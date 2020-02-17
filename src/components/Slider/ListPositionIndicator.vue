@@ -66,9 +66,10 @@ export default Vue.extend({
             letter-spacing: 0.08em
             text-transform: capitalize
             color: #47FFBD
-            text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD  
             
             &.total_count
-                color: #303030 
+                color: #3a1242 
+                -webkit-text-stroke: 2px #47ffa7
+                // text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD  
 
 </style>

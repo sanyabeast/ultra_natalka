@@ -137,9 +137,9 @@ export default Vue.extend({
         
         .ticker 
                 position: absolute
-                top: -160px
+                top: -118px
                 left: auto
-                right: 264px
+                right: 220px
                 width: 100vh
                 transform: rotate(90deg) translateX(100%)
                 transform-origin: bottom right
@@ -173,6 +173,7 @@ export default Vue.extend({
                                         color: #47FFA7
                                         mix-blend-mode: normal
                                         box-sizing: border-box
+                                        letter-spacing: 0.1em
 
                                 .minor_caption
                                         font-family: 'Montserrat', sans-serif

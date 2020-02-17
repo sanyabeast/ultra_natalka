@@ -64,10 +64,11 @@
         @next_clicked="on_minor_page_next_clicked(0)"
         :animations_enabled="minor_pages_animations_enabled"
         :images="[
-          { src: 'pics/osobnyak/os (1).png' },
-          { src: 'pics/osobnyak/os (2).png' },
-          { src: 'pics/osobnyak/os (3).png' },
-          { src: 'pics/osobnyak/os (4).png' },
+          { src: 'pics/osobnyak/3 1.jpg' },
+          { src: 'pics/osobnyak/3 2.jpg' },
+          { src: 'pics/osobnyak/3 4.jpg' },
+          { src: 'pics/osobnyak/3 5.jpg' },
+          { src: 'pics/osobnyak/3 6.jpg' },
         ]"
       />
 
@@ -79,10 +80,11 @@
         @next_clicked="on_minor_page_next_clicked(1)"
         :animations_enabled="minor_pages_animations_enabled"
         :images="[
-          { src: 'pics/lp/lp (1).jpg' },
-          { src: 'pics/lp/lp (2).jpg' },
-          { src: 'pics/lp/lp (3).jpg' },
-          { src: 'pics/lp/lp (4).jpg' },
+          { src: 'pics/lp/MacBook Pro 3 1.jpg' },
+          { src: 'pics/lp/MacBook Pro 3 2.jpg' },
+          { src: 'pics/lp/MacBook Pro 3 3 1.jpg' },
+          { src: 'pics/lp/MacBook Pro 3 4.jpg' },
+          { src: 'pics/lp/MacBook Pro 3 5.jpg' },
         ]"
 
         initial_visibility="hidden"
@@ -133,10 +135,13 @@
         <div class="head">
           <div class="texts">
             <div class="text">Hello!</div>
-            <div class="text">My name is Natalya Panasenko. I am web designer from <span>Kyiv</span>.</div>
+            <div class="text">My name is <span @mouseover="on_about_name_over" @mouseout="on_about_name_out">Natalya Panasenko</span>. I am web designer from <span @mouseover="on_about_city_over" @mouseout="on_about_city_out">Kyiv</span>.</div>
             <div class="text">Some UI, some UX, some JS included.</div>
           </div>
-          <img src="pics/kyiv.png"/>
+          <div class="images">
+            <img ref="about_page_image_city" src="pics/kyiv.png"/>
+            <img ref="about_page_image_me" src="pics/me.png"/>
+          </div>
         </div>
 
         <div class="foot">
@@ -331,6 +336,19 @@ export default Vue.extend({
   },
 
   methods: {
+    on_about_city_over () {
+      this.$refs.about_page_image_city.classList.add("shown")
+    },
+    on_about_city_out () {
+      this.$refs.about_page_image_city.classList.remove("shown")
+    },
+    on_about_name_over () {
+      this.$refs.about_page_image_me.classList.add("shown")
+    },
+    on_about_name_out () {
+      this.$refs.about_page_image_me.classList.remove("shown")
+    },
+
     on_mousemove ( evt ) {
       let now = +new Date()
 
@@ -607,11 +625,15 @@ export default Vue.extend({
         font-weight: 900
         font-size: 62px
         font-variant: small-caps
-        text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
+        -webkit-text-stroke: 2px #47ffa7
+        // text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
         cursor: pointer
+        letter-spacing: 0.1em
+
         &:hover 
           color: #47FFBD
-          text-shadow: -1px -1px 0 transparent,  1px -1px 0 transparent, -1px 1px 0 transparent,  1px 1px 0 transparent 
+          // -webkit-text-stroke: 2px transparent
+          // text-shadow: -1px -1px 0 transparent,  1px -1px 0 transparent, -1px 1px 0 transparent,  1px 1px 0 transparent 
 
       .ticker 
         position: absolute
@@ -643,8 +665,23 @@ export default Vue.extend({
             display: flex
             flex-direction: column
 
-          img 
+          .images
+            position: relative
+            width: 260px
+            height: 170px
+            overflow: hidden
             margin-left: 96px
+            border: 2px solid #47ffbd
+
+            img 
+              
+              opacity: 0
+              position: absolute
+              width: 100%
+              transition: opacity 0.15s ease-in-out
+
+              &.shown
+                opacity: 1
 
         .text
           font-family: 'Montserrat', sans-serif
@@ -655,7 +692,10 @@ export default Vue.extend({
           line-height: 28px
 
           span 
-            color: #fff
+            text-decoration: underline
+
+            &:hover 
+              color: #fff
 
           
           
@@ -717,11 +757,21 @@ export default Vue.extend({
           flex-direction: column-reverse
           align-items: flex-start
 
-          img 
-            margin-left: 0
-            margin-bottom: 48px
+          span 
+            text-decoration: none
+
+            &:hover 
+              color: auto
+
+          .images
+            display: none
+            img 
+              margin-left: 0
+              margin-bottom: 48px
+              display: none
 
         .email  
+          letter-spacing: 0.02em
           .content
             padding: 0
             font-size: 24px

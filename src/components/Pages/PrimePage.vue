@@ -115,9 +115,9 @@ export default Vue.extend({
 
         .ticker 
                 position: absolute
-                top: -160px
+                top: -118px
                 left: auto
-                right: 264px
+                right: 200px
                 width: 100vh
                 transform: rotate(90deg) translateX(100%)
                 transform-origin: bottom right
@@ -179,5 +179,6 @@ export default Vue.extend({
                                         line-height: 22px
                                         text-transform: capitalize
                                         transform: translateY(-4px)
+                                        letter-spacing: 0
 
 </style>

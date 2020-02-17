@@ -113,7 +113,8 @@ export default Vue.extend({
                         font-weight: 900
                         font-size: 96px
                         font-variant: small-caps
-                        text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
+                        -webkit-text-stroke: 2px #47ffa7
+                        // text-shadow: -1px -1px 0 #47FFBD,  1px -1px 0 #47FFBD, -1px 1px 0 #47FFBD,  1px 1px 0 #47FFBD 
                         transform-origin: center center
                         letter-spacing: 0.1em
                      
